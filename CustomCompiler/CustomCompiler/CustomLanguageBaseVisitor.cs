@@ -55,6 +55,16 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <return>The visitor result.</return>
 	public virtual Result VisitMain([NotNull] CustomLanguageParser.MainContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.global"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitGlobal([NotNull] CustomLanguageParser.GlobalContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.func_decl"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -84,6 +94,36 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitIf_statement([NotNull] CustomLanguageParser.If_statementContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.other_statements"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitOther_statements([NotNull] CustomLanguageParser.Other_statementsContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.else_if_statement"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitElse_if_statement([NotNull] CustomLanguageParser.Else_if_statementContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.else_statement"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitElse_statement([NotNull] CustomLanguageParser.Else_statementContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.loop"/>.
 	/// <para>
@@ -171,6 +211,16 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <return>The visitor result.</return>
 	public virtual Result VisitEqualExp([NotNull] CustomLanguageParser.EqualExpContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.param_decl"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitParam_decl([NotNull] CustomLanguageParser.Param_declContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.var_decl"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -191,6 +241,17 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitSmallerEqExp([NotNull] CustomLanguageParser.SmallerEqExpContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>preincrementExp</c>
+	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitPreincrementExp([NotNull] CustomLanguageParser.PreincrementExpContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>variableAtomExp</c>
 	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
@@ -214,6 +275,17 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <return>The visitor result.</return>
 	public virtual Result VisitValueAtomEXp([NotNull] CustomLanguageParser.ValueAtomEXpContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>predecrementExp</c>
+	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitPredecrementExp([NotNull] CustomLanguageParser.PredecrementExpContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by the <c>logicNotExp</c>
 	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
 	/// <para>
@@ -235,6 +307,17 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitFunctionCallExp([NotNull] CustomLanguageParser.FunctionCallExpContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by the <c>postdecrementExp</c>
+	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitPostdecrementExp([NotNull] CustomLanguageParser.PostdecrementExpContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>moduloExp</c>
 	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
@@ -302,6 +385,17 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <return>The visitor result.</return>
 	public virtual Result VisitLogicOrExp([NotNull] CustomLanguageParser.LogicOrExpContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>paranhesisExp</c>
+	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitParanhesisExp([NotNull] CustomLanguageParser.ParanhesisExpContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by the <c>subtractExp</c>
 	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
 	/// <para>
@@ -368,6 +462,17 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <return>The visitor result.</return>
 	public virtual Result VisitAditionExp([NotNull] CustomLanguageParser.AditionExpContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>postincrementExp</c>
+	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitPostincrementExp([NotNull] CustomLanguageParser.PostincrementExpContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.return_type"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
@@ -397,4 +502,14 @@ public partial class CustomLanguageBaseVisitor<Result> : AbstractParseTreeVisito
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitData_value([NotNull] CustomLanguageParser.Data_valueContext context) { return VisitChildren(context); }
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.name"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitName([NotNull] CustomLanguageParser.NameContext context) { return VisitChildren(context); }
 }
