@@ -7,7 +7,7 @@ Variables:
 --> <type>(Int) <name>(b) <value>()
 Control Structures: 
 
-<return>(Float) <name>(addIntegers) : <type>(Normal) <iteration>())
+<return>(Float) <name>(divideIntegers) : <type>(Normal) <iteration>())
 Parameters: 
 --> <type>(Int) <name>(first) <value>()
 --> <type>(Int) <name>(third) <value>()

@@ -21,6 +21,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     bool _inGlobalScope = true;
     bool _declareTypeName = false;
     bool _declareValue = false;
+    bool _callingFunction = false;
 
     public override ProgramData VisitBase_structure([NotNull] CustomLanguageParser.Base_structureContext context) //Done
     {
@@ -28,62 +29,6 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         return _programData;
     }
     
-    //public override ProgramData VisitMain([NotNull] CustomLanguageParser.MainContext context) //Done
-    //{
-    //    _inGlobalScope = false;
-    //    _programData.FunctionList.Add(new ProgramData.Function());
-    //    _currentScope.Add(_programData.FunctionList.Last());
-    //    _programData.FunctionList.Last().FunctionType = ProgramData.FuncType.Main;
-    //    _programData.FunctionList.Last().IterationType = ProgramData.IterationType.Iterative;
-
-    //    Visit(context.return_type());
-
-    //    string token = "";
-    //    string lexem = "";
-
-    //    if(context.MAIN_FUNC() != null)
-    //    {
-    //        token = "MAIN_FUNC";
-    //        lexem = context.MAIN_FUNC().GetText();
-
-    //        _programData.FunctionList.Last().Name = context.MAIN_FUNC().GetText();
-    //    }
-    //    else
-    //    {
-    //        throw new Exception("No main function found...");
-    //    }
-
-    //    _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
-
-        
-    //    if (context.OPENPTHS() != null)
-    //    {
-    //        _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: {context.OPENPTHS().GetText()} | LINE: {context.Start.Line}>");
-    //    }
-    //    else
-    //    {
-    //        throw new Exception($"At Line {context.Start.Line}: Missing open brackets..");
-    //    }
-
-    //    Visit(context.param_decl());
-
-    //    if (context.CLOSEPTHS() != null)
-    //    {
-    //        _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: {context.CLOSEPTHS().GetText()} | LINE: {context.Start.Line}>");
-    //    }
-    //    else
-    //    {
-    //        throw new Exception($"At Line {context.Start.Line}: Missing closed brackets..");
-    //    }
-
-    //    Visit(context.body());
-
-
-    //    _currentScope.Remove(_currentScope.Last());
-    //    _inGlobalScope = true;
-    //    return _programData;
-    //}
-
     public override ProgramData VisitGlobal([NotNull] CustomLanguageParser.GlobalContext context)
     {
         _inGlobalScope = true;
@@ -616,8 +561,9 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     {
         Visit(context.name());
         if(_declareValue)
+        {
             _declareValue = false;
-
+        }
         return _programData;
     }
     
@@ -676,7 +622,11 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     
     public override ProgramData VisitFunctionCallExp([NotNull] CustomLanguageParser.FunctionCallExpContext context)
     {
+        _callingFunction = true;
+
         Visit(context.name());
+
+        _callingFunction = false;
 
         if(context.OPENPTHS() != null)
         {
@@ -908,6 +858,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+
                 _variables.Last().Value = context.GetText();
             }
 
@@ -1218,22 +1169,24 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 
         if (context.INTEGER_VALUE() != null)
         {
-            //token = ProgramData.Type.Int.ToString();
+            if(_declareValue && _variables.Last().VariableType == ProgramData.ReturnType.String)
+                throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+
             token = "INT";
         }
-        else if (context.FLOAT_VALUE() != null)
+        else if (_declareValue && context.FLOAT_VALUE() != null)
         {
-            //token = ProgramData.Type.Float.ToString();
+            if (_variables.Last().VariableType == ProgramData.ReturnType.String)
+                throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+
             token = "FLOAT";
         }
-        else if (context.STRING_VALUE() != null)
+        else if (_declareValue && context.STRING_VALUE() != null)
         {
-            //token = ProgramData.Type.String.ToString();
+            if (_variables.Last().VariableType != ProgramData.ReturnType.String)
+                throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+
             token = "STRING";
-        }
-        else
-        {
-            throw new Exception($"Value not matching type");
         }
         string lexem = context.GetText();
 
@@ -1263,6 +1216,24 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         }
 
         _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
+
+        if (_callingFunction)
+        {
+            bool ok = false;
+
+            foreach(var f in _programData.FunctionList)
+            {
+                if(f.Name == lexem)
+                {
+                    ok = true;
+                    break;
+                }
+            }
+
+            if(!ok)
+                throw new Exception($"At Line {context.Start.Line}: Invalid function name..");
+
+        }
 
         if (_declareValue)
         {

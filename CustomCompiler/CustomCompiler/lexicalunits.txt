@@ -20,7 +20,7 @@
 <TOKEN: SEMICOLON | LEXEM: ; | Line: 4>
 <TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 5>
 <TOKEN: FLOAT_TYPE | LEXEM: float | Line: 7>
-<TOKEN: NAME | LEXEM: addIntegers | LINE: 7>
+<TOKEN: NAME | LEXEM: divideIntegers | LINE: 7>
 <TOKEN: OPENPTHS | LEXEM: ( | LINE: 7>
 <TOKEN: INT | LEXEM: int | Line: 7>
 <TOKEN: NAME | LEXEM: first | Line: 7>
@@ -109,13 +109,13 @@
 <TOKEN: AND | LEXEM: && | Line: 32>
 <TOKEN: NAME | LEXEM: globalVariable | Line: 32>
 <TOKEN: DIFF | LEXEM: != | Line: 32>
-<TOKEN: FLOAT | LEXEM: 16.54 | Line: 32>
+<TOKEN:  | LEXEM: 16.54 | Line: 32>
 <TOKEN: CLOSEPTHS | LEXEM: ) | Line: 32>
 <TOKEN: ELSE | LEXEM: else | Line: 37>
 <TOKEN: OPENBLOCK | LEXEM: { | LINE: 38>
 <TOKEN: NAME | LEXEM: myString | Line: 39>
 <TOKEN: EQUAL | LEXEM: = | Line: 39>
-<TOKEN: STRING | LEXEM: "At least one of the conditions is false" | Line: 39>
+<TOKEN:  | LEXEM: "At least one of the conditions is false" | Line: 39>
 <TOKEN: SEMICOLON | LEXEM: ; | Line: 39>
 <TOKEN: INT | LEXEM: int | Line: 40>
 <TOKEN: NAME | LEXEM: temp | Line: 40>
@@ -138,24 +138,4 @@
 <TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 47>
 <TOKEN: NAME | LEXEM: myThirdVariable | Line: 49>
 <TOKEN: EQUAL | LEXEM: = | Line: 49>
-<TOKEN: NAME | LEXEM: addIntegers | Line: 49>
-<TOKEN: OPENPTHS | LEXEM: ( | Line: 49>
-<TOKEN: NAME | LEXEM: myFirstVariable | Line: 49>
-<TOKEN: COMMA | LEXEM: , | Line: 49>
-<TOKEN: NAME | LEXEM: mySecondVariable | Line: 49>
-<TOKEN: CLOSEPTHS | LEXEM: ) | Line: 49>
-<TOKEN: SEMICOLON | LEXEM: ; | Line: 49>
-<TOKEN: FLOAT | LEXEM: float | Line: 51>
-<TOKEN: NAME | LEXEM: myFloat | Line: 51>
-<TOKEN: EQUAL | LEXEM: = | Line: 51>
-<TOKEN: NAME | LEXEM: divideIntegers | Line: 51>
-<TOKEN: OPENPTHS | LEXEM: ( | Line: 51>
-<TOKEN: NAME | LEXEM: myThirdVariable | Line: 51>
-<TOKEN: COMMA | LEXEM: , | Line: 51>
-<TOKEN: NAME | LEXEM: myFirstVariable | Line: 51>
-<TOKEN: CLOSEPTHS | LEXEM: ) | Line: 51>
-<TOKEN: SEMICOLON | LEXEM: ; | Line: 51>
-<TOKEN: RETURN | LEXEM: return | Line: 53>
-<TOKEN: INT | LEXEM: 0 | Line: 53>
-<TOKEN: SEMICOLON | LEXEM: ; | Line: 53>
-<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 54>
+<TOKEN: NAME | LEXEM: asdf | Line: 49>

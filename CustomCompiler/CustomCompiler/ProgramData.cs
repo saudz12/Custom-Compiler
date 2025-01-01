@@ -3,6 +3,7 @@ using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,15 @@ public class ProgramData
         Double,
         String,
         Void,
+    }
+    public bool ConvertableType(ReturnType t1, ReturnType t2)
+    {
+        if ((t1 == ReturnType.Int || t1 == ReturnType.Float || t1 == ReturnType.Double) && t2 == ReturnType.String)
+            return false;
+        if ((t2 == ReturnType.Int || t2 == ReturnType.Float || t2 == ReturnType.Double) && t1 == ReturnType.String)
+            return false;
+
+        return true;
     }
     public enum FuncType
     {

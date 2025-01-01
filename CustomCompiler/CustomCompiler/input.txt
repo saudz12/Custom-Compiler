@@ -4,7 +4,7 @@
     return first + second;
 }
 
-float addIntegers(int first, int third)
+float divideIntegers(int first, int third)
 {
     int a, b;
     if (second == 0)
