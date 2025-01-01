@@ -1,4 +1,5 @@
 ﻿using Antlr4.Runtime.Misc;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ public class ProgramData
         Recursive,
         Iterative,
     }
+    public bool HasMain = false;
 
     StreamWriter _writer = new StreamWriter("../../../lexicalunits.txt");
     public void WriteLexic(string s)
@@ -46,7 +48,17 @@ public class ProgramData
         }
     }
     public List<Variable> GlobalVariables { get; set; } = new List<Variable>();
-    
+
+    public bool CheckGlobalReoccurence(string name)
+    {
+        foreach (var variable in GlobalVariables)
+        {
+            if (variable.Name == name)
+                return true;
+        }
+        return false;
+    }
+
     public interface IScope
     {
         public List<Variable> Variables { get; set; }
@@ -93,9 +105,74 @@ public class ProgramData
         {
             return $"<return>({ReturnType.ToString()}) <name>({Name}) : <type>({FunctionType.ToString()}) <iteration>({IterationType.ToString()}))";
         }
+        public bool CheckReoccurance(string name)
+        {
+            foreach (Variable v in Parameters)
+            {
+                if (v.Name == name)
+                    return true ;
+            }
+            foreach (Variable v in Variables)
+            {
+                if (v.Name == name)
+                    return true;
+            }
+
+            return false;
+        }
+
     }
 
     public List<Function> FunctionList { get; set; } = new List<Function>();
 
+    public bool CheckFunctionReoccurance(Function function)
+    {
+        for (int i = 0; i < FunctionList.Count() - 1; i++)
+        {
+            Function f = FunctionList[i];
+
+            if (f.Name != function.Name)
+                continue;
+            if (f.Parameters.Count != function.Parameters.Count)
+                continue;
+
+            bool ok = true;
+
+            for (int j = 0; j < f.Parameters.Count() && ok; j++)
+            {
+                if (f.Parameters[j].VariableType != function.Parameters[j].VariableType)
+                    ok = false;
+            }
+
+            if (ok)
+                return true;
+        }
+
+        return false;
+    }
+
+    public bool CheckFunctionReoccurance(Function f1, Function f2)
+    {
+        if(f1.Name != f2.Name)
+            return false;
+        if(f1.Parameters.Count != f2.Parameters.Count)
+            return false;
+
+        HashSet<string> names = new HashSet<string>();
+        foreach (Variable v in f1.Parameters)
+        {
+            names.Add(v.ToString());
+        }
+
+        bool ok = true;
+
+        foreach (Variable v in f2.Parameters)
+        {
+            if (!names.Contains(v.ToString()))
+                ok = false;
+        }
+
+        return ok;
+    }
 }
 

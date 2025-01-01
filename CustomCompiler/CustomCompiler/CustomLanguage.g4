@@ -2,9 +2,7 @@ grammar CustomLanguage;
 
 /* Parser rules */
 
-base_structure: global main;
-
-main: return_type MAIN_FUNC OPENPTHS param_decl CLOSEPTHS body;
+base_structure: global func_decl;
 
 global: (func_decl | global_var)*;
 
@@ -116,7 +114,6 @@ FLOAT_TYPE: 'float';
 DOUBLE_TYPE: 'double';
 STRING_TYPE: 'string';
 VOID_TYPE: 'void';
-MAIN_FUNC: 'main';
 RETURN: 'return';
 
 FOR_LOOP: 'for';

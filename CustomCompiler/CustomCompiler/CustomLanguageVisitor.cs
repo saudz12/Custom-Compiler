@@ -38,12 +38,6 @@ public interface ICustomLanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBase_structure([NotNull] CustomLanguageParser.Base_structureContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="CustomLanguageParser.main"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitMain([NotNull] CustomLanguageParser.MainContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.global"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

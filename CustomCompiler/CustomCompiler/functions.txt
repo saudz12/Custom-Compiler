@@ -1,19 +1,23 @@
 <return>(Int) <name>(addIntegers) : <type>(Normal) <iteration>())
 Parameters: 
 --> <type>(Int) <name>(first) <value>()
---> <type>(Int) <name>(second) <value>()
+--> <type>(Float) <name>(fourth) <value>()
 Variables: 
+--> <type>(Int) <name>(a) <value>()
+--> <type>(Int) <name>(b) <value>()
 Control Structures: 
 
-<return>(Float) <name>(divideIntegers) : <type>(Normal) <iteration>())
+<return>(Float) <name>(addIntegers) : <type>(Normal) <iteration>())
 Parameters: 
 --> <type>(Int) <name>(first) <value>()
---> <type>(Int) <name>(second) <value>()
+--> <type>(Int) <name>(third) <value>()
 Variables: 
+--> <type>(Int) <name>(a) <value>()
+--> <type>(Int) <name>(b) <value>()
 Control Structures: 
-(If, 8)
+(If, 10)
 
-<return>(Int) <name>(main) : <type>(Main) <iteration>(Iterative))
+<return>(Int) <name>(main) : <type>(Normal) <iteration>())
 Parameters: 
 --> <type>(Int) <name>(x) <value>()
 --> <type>(Int) <name>(y) <value>()
@@ -26,6 +30,9 @@ Variables:
 --> <type>(Int) <name>(temp) <value>(myFirstVariable+5)
 --> <type>(Float) <name>(myFloat) <value>(divideIntegers(myThirdVariable,myFirstVariable))
 Control Structures: 
-(If, 30)
-(Else, 35)
+(for, 25)
+(If, 32)
+(Else, 37)
+(while, 43)
+(while, 44)
 

@@ -23,11 +23,19 @@ public class Program
 
             CustomLanguageParser.Base_structureContext context = parser.base_structure();
             CustomCompilerVisitor visitor = new CustomCompilerVisitor();
-            var restult = visitor.Visit(context);
+            var result = visitor.Visit(context);
+
+            if(!result.HasMain)
+                throw new Exception($"Error: Main does not exist..");
+
+            if (result.FunctionList.Last().Name != "main")
+                throw new Exception($"Error: Main should be declared last..");
+
+            Console.WriteLine("Valid program!");
 
             StreamWriter writeGlobals = new StreamWriter("../../../globals.txt");
 
-            foreach (var global in restult.GlobalVariables)
+            foreach (var global in result.GlobalVariables)
             {
                 writeGlobals.WriteLine(global.ToString());
                 writeGlobals.Flush();
@@ -37,7 +45,7 @@ public class Program
 
             StreamWriter writeFunc = new StreamWriter("../../../functions.txt");
             
-            foreach (var func in restult.FunctionList)
+            foreach (var func in result.FunctionList)
             {
                 writeFunc.WriteLine(func.ToString());
                 writeFunc.Flush();

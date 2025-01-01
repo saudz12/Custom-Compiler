@@ -13,7 +13,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 {
     ProgramData _programData = new ProgramData();
 
-    List<ProgramData.IScope> _currentScope = new List<ProgramData.IScope>();
+    List<ProgramData.Function> _currentScope = new List<ProgramData.Function>();
    
     List<ProgramData.Variable> _variables = new List<ProgramData.Variable>();
 
@@ -28,61 +28,61 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         return _programData;
     }
     
-    public override ProgramData VisitMain([NotNull] CustomLanguageParser.MainContext context) //Done
-    {
-        _inGlobalScope = false;
-        _programData.FunctionList.Add(new ProgramData.Function());
-        _currentScope.Add(_programData.FunctionList.Last());
-        _programData.FunctionList.Last().FunctionType = ProgramData.FuncType.Main;
-        _programData.FunctionList.Last().IterationType = ProgramData.IterationType.Iterative;
+    //public override ProgramData VisitMain([NotNull] CustomLanguageParser.MainContext context) //Done
+    //{
+    //    _inGlobalScope = false;
+    //    _programData.FunctionList.Add(new ProgramData.Function());
+    //    _currentScope.Add(_programData.FunctionList.Last());
+    //    _programData.FunctionList.Last().FunctionType = ProgramData.FuncType.Main;
+    //    _programData.FunctionList.Last().IterationType = ProgramData.IterationType.Iterative;
 
-        Visit(context.return_type());
+    //    Visit(context.return_type());
 
-        string token = "";
-        string lexem = "";
+    //    string token = "";
+    //    string lexem = "";
 
-        if(context.MAIN_FUNC() != null)
-        {
-            token = "MAIN_FUNC";
-            lexem = context.MAIN_FUNC().GetText();
+    //    if(context.MAIN_FUNC() != null)
+    //    {
+    //        token = "MAIN_FUNC";
+    //        lexem = context.MAIN_FUNC().GetText();
 
-            _programData.FunctionList.Last().Name = context.MAIN_FUNC().GetText();
-        }
-        else
-        {
-            throw new Exception("No main function found...");
-        }
+    //        _programData.FunctionList.Last().Name = context.MAIN_FUNC().GetText();
+    //    }
+    //    else
+    //    {
+    //        throw new Exception("No main function found...");
+    //    }
 
-        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
+    //    _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
 
         
-        if (context.OPENPTHS() != null)
-        {
-            _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: {context.OPENPTHS().GetText()} | LINE: {context.Start.Line}>");
-        }
-        else
-        {
-            throw new Exception($"At Line {context.Start.Line}: Missing open brackets..");
-        }
+    //    if (context.OPENPTHS() != null)
+    //    {
+    //        _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: {context.OPENPTHS().GetText()} | LINE: {context.Start.Line}>");
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"At Line {context.Start.Line}: Missing open brackets..");
+    //    }
 
-        Visit(context.param_decl());
+    //    Visit(context.param_decl());
 
-        if (context.CLOSEPTHS() != null)
-        {
-            _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: {context.CLOSEPTHS().GetText()} | LINE: {context.Start.Line}>");
-        }
-        else
-        {
-            throw new Exception($"At Line {context.Start.Line}: Missing closed brackets..");
-        }
+    //    if (context.CLOSEPTHS() != null)
+    //    {
+    //        _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: {context.CLOSEPTHS().GetText()} | LINE: {context.Start.Line}>");
+    //    }
+    //    else
+    //    {
+    //        throw new Exception($"At Line {context.Start.Line}: Missing closed brackets..");
+    //    }
 
-        Visit(context.body());
+    //    Visit(context.body());
 
 
-        _currentScope.Remove(_currentScope.Last());
-        _inGlobalScope = true;
-        return _programData;
-    }
+    //    _currentScope.Remove(_currentScope.Last());
+    //    _inGlobalScope = true;
+    //    return _programData;
+    //}
 
     public override ProgramData VisitGlobal([NotNull] CustomLanguageParser.GlobalContext context)
     {
@@ -120,11 +120,21 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         {
             _programData.WriteLexic($"<TOKEN: NAME | LEXEM: {context.NAME().GetText()} | LINE: {context.Start.Line}>");
             _programData.FunctionList.Last().Name = context.NAME().GetText();
+
+            if (_programData.FunctionList.Last().Name == "main")
+            {
+                if (_programData.HasMain)
+                    throw new Exception($"At Line {context.Start.Line}: Main already delcared..");
+                else
+                    _programData.HasMain = true;
+            }
         }
+
         else
         {
             throw new Exception($"At Line {context.Start.Line}: Missing opened brackets..");
         }
+
 
         if (context.OPENPTHS() != null)
         {
@@ -135,8 +145,10 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             throw new Exception($"At Line {context.Start.Line}: Function requires a valid name..");
         }
 
-
         Visit(context.param_decl());
+
+        if (_programData.CheckFunctionReoccurance(_programData.FunctionList.Last()))
+            throw new Exception($"At Line {context.Start.Line}: Function {_programData.FunctionList.Last().Name} already declared..");
 
         if (context.CLOSEPTHS() != null)
         {
@@ -149,9 +161,9 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 
         Visit(context.body());
 
-
         _currentScope.Remove(_currentScope.Last());
         _inGlobalScope = true;
+
         return _programData;
     }
 
@@ -222,7 +234,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     {
         if (context.ELSE_IF() != null)
         {
-            _programData.WriteLexic($"<TOKEN: ELSE_IF | LEXEM: else if| Line: {context.Start.Line}>");
+            _programData.WriteLexic($"<TOKEN: ELSE_IF | LEXEM: else if | Line: {context.Start.Line}>");
 
             _programData.WriteLexic($"<TOKEN: IF | LEXEM: if | Line: {context.Start.Line}>");
 
@@ -256,7 +268,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     {
         if(context.ELSE() != null)
         {
-            _programData.WriteLexic($"<TOKEN: ELSE| LEXEM: else| Line: {context.Start.Line}>");
+            _programData.WriteLexic($"<TOKEN: ELSE | LEXEM: else | Line: {context.Start.Line}>");
 
             if (context.body() == null)
                 throw new Exception($"At Line {context.Start.Line}: Missing body..");
@@ -272,8 +284,6 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 
     public override ProgramData VisitLoop([NotNull] CustomLanguageParser.LoopContext context)
     {
-        int line = context.Start.Line;
-
         string token = "";
         string lexem = "";
 
@@ -284,34 +294,26 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         }
         else if (context.WHILE_LOOP() != null)
         {
-            token = "FOR_WHILE";
+            token = "WHILE";
             lexem = "while";
         }
-        //else
-        //{
-        //    throw new Exception("Invalid loop term");
-        //}
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+        _programData.FunctionList.Last().ControlStructures.Add(new Pair<string, int>(lexem, context.Start.Line));
 
-        return VisitChildren(context);
+        VisitChildren(context);
+        
+        return _programData;
     }
 
     public override ProgramData VisitReturn([NotNull] CustomLanguageParser.ReturnContext context)
     {
-        int line = context.Start.Line;
+        _programData.WriteLexic($"<TOKEN: RETURN | LEXEM: return | Line: {context.Start.Line}>");
 
-        string token = "RETURN";
-
-        string lexem = "return";
-
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
-
-        _programData.WriteLexic(format);
-
-        return VisitChildren(context);
+        VisitChildren(context);
+    
+        return _programData;
     }
 
     public override ProgramData VisitCode_line([NotNull] CustomLanguageParser.Code_lineContext context) 
@@ -500,6 +502,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 
         return _programData;
     }
+
     public override ProgramData VisitVar_decl([NotNull] CustomLanguageParser.Var_declContext context)
     { 
         VisitChildren(context);
@@ -1234,7 +1237,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         }
         string lexem = context.GetText();
 
-        _programData.WriteLexic($"<TOKEN: {token}| LEXEM: {lexem}| Line: {context.Start.Line}>");
+        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
 
         if (_declareValue)
         {
@@ -1268,6 +1271,12 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 
         if (_declareTypeName)
         {
+            if (_currentScope.Count != 0)
+                if (_currentScope.Last().CheckReoccurance(lexem))
+                    throw new Exception($"At Line {context.Start.Line}: Parameter/Variable already declared..");
+            if (_programData.CheckGlobalReoccurence(lexem))
+                throw new Exception($"At Line {context.Start.Line}: Naming conflict with Global variables..");
+
             _variables.Last().Name = lexem;
 
             if (_inGlobalScope)
