@@ -50,6 +50,12 @@ public interface ICustomLanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitGlobal([NotNull] CustomLanguageParser.GlobalContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.global_var"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitGlobal_var([NotNull] CustomLanguageParser.Global_varContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.func_decl"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -61,6 +67,18 @@ public interface ICustomLanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitBody([NotNull] CustomLanguageParser.BodyContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.openedblock"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOpenedblock([NotNull] CustomLanguageParser.OpenedblockContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.closedblock"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitClosedblock([NotNull] CustomLanguageParser.ClosedblockContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.if_statement"/>.
 	/// </summary>
@@ -91,6 +109,12 @@ public interface ICustomLanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLoop([NotNull] CustomLanguageParser.LoopContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.code_line"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitCode_line([NotNull] CustomLanguageParser.Code_lineContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.return"/>.
 	/// </summary>
@@ -146,11 +170,35 @@ public interface ICustomLanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitParam_decl([NotNull] CustomLanguageParser.Param_declContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.other_param"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOther_param([NotNull] CustomLanguageParser.Other_paramContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.init_param"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInit_param([NotNull] CustomLanguageParser.Init_paramContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.var_decl"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitVar_decl([NotNull] CustomLanguageParser.Var_declContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.other_var"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOther_var([NotNull] CustomLanguageParser.Other_varContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.init_var"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInit_var([NotNull] CustomLanguageParser.Init_varContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>smallerEqExp</c>
 	/// labeled alternative in <see cref="CustomLanguageParser.instruction"/>.
@@ -305,6 +353,18 @@ public interface ICustomLanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitPostincrementExp([NotNull] CustomLanguageParser.PostincrementExpContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.instruction_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInstruction_list([NotNull] CustomLanguageParser.Instruction_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.other_instructions"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOther_instructions([NotNull] CustomLanguageParser.Other_instructionsContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.return_type"/>.
 	/// </summary>

@@ -12,9 +12,9 @@ float divideIntegers(int first, int second)
     return first / second;/*iasnfkajsfnjasf
 aSDKjn*/}
 
-double globalVariable = 15.67; //Using global variables is bad practice
+double globalVariable = 15.67, secondGlobal = 123.12; //Using global variables is bad practice
 
-int main()
+int main(int x, int y)
 {
     int myFirstVariable = 17;
     float mySecondVariable = 45;

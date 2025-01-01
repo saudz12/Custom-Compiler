@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using static CustomCompiler.ProgramData;
 
 namespace CustomCompiler;
 
@@ -11,100 +13,261 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 {
     ProgramData _programData = new ProgramData();
 
+    List<ProgramData.IScope> _currentScope = new List<ProgramData.IScope>();
+   
+    List<ProgramData.Variable> _variables = new List<ProgramData.Variable>();
 
-    public override ProgramData VisitBase_structure([NotNull] CustomLanguageParser.Base_structureContext context)
+    bool _inAntet = false;
+    bool _inGlobalScope = true;
+    bool _declareTypeName = false;
+    bool _declareValue = false;
+
+    public override ProgramData VisitBase_structure([NotNull] CustomLanguageParser.Base_structureContext context) //Done
     {
-        return VisitChildren(context);
+        VisitChildren(context);
+        return _programData;
     }
     
-    public override ProgramData VisitMain([NotNull] CustomLanguageParser.MainContext context)
+    public override ProgramData VisitMain([NotNull] CustomLanguageParser.MainContext context) //Done
     {
-        int line = context.Start.Line;
+        _inGlobalScope = false;
+        _programData.FunctionList.Add(new ProgramData.Function());
+        _currentScope.Add(_programData.FunctionList.Last());
+        _programData.FunctionList.Last().FunctionType = ProgramData.FuncType.Main;
+        _programData.FunctionList.Last().IterationType = ProgramData.IterationType.Iterative;
+
+        Visit(context.return_type());
 
         string token = "";
-
         string lexem = "";
 
         if(context.MAIN_FUNC() != null)
         {
             token = "MAIN_FUNC";
             lexem = context.MAIN_FUNC().GetText();
+
+            _programData.FunctionList.Last().Name = context.MAIN_FUNC().GetText();
         }
         else
         {
             throw new Exception("No main function found...");
         }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+        
+        if (context.OPENPTHS() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: {context.OPENPTHS().GetText()} | LINE: {context.Start.Line}>");
+        }
+        else
+        {
+            throw new Exception($"At Line {context.Start.Line}: Missing open brackets..");
+        }
 
-        return VisitChildren(context);
+        Visit(context.param_decl());
+
+        if (context.CLOSEPTHS() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: {context.CLOSEPTHS().GetText()} | LINE: {context.Start.Line}>");
+        }
+        else
+        {
+            throw new Exception($"At Line {context.Start.Line}: Missing closed brackets..");
+        }
+
+        Visit(context.body());
+
+
+        _currentScope.Remove(_currentScope.Last());
+        _inGlobalScope = true;
+        return _programData;
     }
 
     public override ProgramData VisitGlobal([NotNull] CustomLanguageParser.GlobalContext context)
     {
-        return VisitChildren(context);
+        _inGlobalScope = true;
+        VisitChildren(context);
+        _inGlobalScope = false;
+
+        return _programData;
+    }
+
+    public override ProgramData VisitGlobal_var([NotNull] CustomLanguageParser.Global_varContext context)
+    {
+        _inGlobalScope = true;
+
+        VisitChildren(context);
+
+        if(context.SEMICOLON() == null)
+            throw new Exception($"At Line {context.Start.Line}: Missing semicolon..");
+        
+        _programData.WriteLexic($"<TOKEN: SEMICOLON | LEXEM: {context.SEMICOLON().GetText()} | LINE: {context.Start.Line}>");
+
+        return _programData;
     }
 
     public override ProgramData VisitFunc_decl([NotNull] CustomLanguageParser.Func_declContext context)
     {
-        return VisitChildren(context);
+        _inGlobalScope = false;
+        _programData.FunctionList.Add(new ProgramData.Function());
+        _currentScope.Add(_programData.FunctionList.Last());
+        _programData.FunctionList.Last().FunctionType = ProgramData.FuncType.Normal;
+
+        Visit(context.return_type());
+
+        if (context.NAME() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: NAME | LEXEM: {context.NAME().GetText()} | LINE: {context.Start.Line}>");
+            _programData.FunctionList.Last().Name = context.NAME().GetText();
+        }
+        else
+        {
+            throw new Exception($"At Line {context.Start.Line}: Missing opened brackets..");
+        }
+
+        if (context.OPENPTHS() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: {context.OPENPTHS().GetText()} | LINE: {context.Start.Line}>");
+        }
+        else
+        {
+            throw new Exception($"At Line {context.Start.Line}: Function requires a valid name..");
+        }
+
+
+        Visit(context.param_decl());
+
+        if (context.CLOSEPTHS() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: {context.CLOSEPTHS().GetText()} | LINE: {context.Start.Line}>");
+        }
+        else
+        {
+            throw new Exception($"At Line {context.Start.Line}: Missing closed brackets..");
+        }
+
+        Visit(context.body());
+
+
+        _currentScope.Remove(_currentScope.Last());
+        _inGlobalScope = true;
+        return _programData;
     }
 
     public override ProgramData VisitBody([NotNull] CustomLanguageParser.BodyContext context)
     {
-        return VisitChildren(context);
+        VisitChildren(context);
+
+        return _programData;
+    }
+
+    public override ProgramData VisitOpenedblock([NotNull] CustomLanguageParser.OpenedblockContext context) 
+    {
+        if(context.OPENEDBLOCK() == null)
+            throw new Exception($"At Line {context.Start.Line}: Missing open brackets..");
+
+        _programData.WriteLexic($"<TOKEN: OPENBLOCK | LEXEM: {context.OPENEDBLOCK().GetText()} | LINE: {context.Start.Line}>");
+
+        return _programData;
+    }
+
+    public override ProgramData VisitClosedblock([NotNull] CustomLanguageParser.ClosedblockContext context)
+    {
+        if (context.CLOSEDBLOCK() == null)
+            throw new Exception($"At Line {context.Start.Line}: Missing closed brackets..");
+
+        _programData.WriteLexic($"<TOKEN: CLOSEDBLOCK | LEXEM: {context.CLOSEDBLOCK().GetText()} | LINE: {context.Start.Line}>");
+
+        return _programData;
     }
 
     public override ProgramData VisitIf_statement([NotNull] CustomLanguageParser.If_statementContext context)
     {
-        int line = context.Start.Line;
+        if (context.IF() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: IF | LEXEM: if | Line: {context.Start.Line}>");
 
-        string token = "IF";
+            if (context.OPENPTHS() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing opening brackets..");
+            else
+                _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: ( | Line: {context.Start.Line}>");
 
-        string lexem = "return";
+            if(context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
+            else
+                Visit(context.instruction());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            if (context.CLOSEPTHS() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing closing brackets..");
+            else
+                _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+            _programData.FunctionList.Last().ControlStructures.Add(new Pair<string, int>("If", context.Start.Line));
 
-        return VisitChildren(context);
+        }
+        Visit(context.other_statements());
+
+        return _programData;
     }
 
     public override ProgramData VisitOther_statements([NotNull] CustomLanguageParser.Other_statementsContext context)
     {
-        return VisitChildren(context);
+        VisitChildren(context);
+
+        return _programData;
     }
 
     public override ProgramData VisitElse_if_statement([NotNull] CustomLanguageParser.Else_if_statementContext context)
     {
-        int line = context.Start.Line;
+        if (context.ELSE_IF() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: ELSE_IF | LEXEM: else if| Line: {context.Start.Line}>");
 
-        string token = "ELSE_IF";
+            _programData.WriteLexic($"<TOKEN: IF | LEXEM: if | Line: {context.Start.Line}>");
 
-        string lexem = "else if";
+            if (context.OPENPTHS() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing opening brackets..");
+            else
+                _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: ( | Line: {context.Start.Line}>");
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
+            else
+                Visit(context.instruction());
 
-        _programData.WriteLexic(format);
+            if (context.CLOSEPTHS() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing closing brackets..");
+            else
+                _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | Line: {context.Start.Line}>");
 
-        return VisitChildren(context);
+            if (context.body() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing body..");
+
+            _programData.FunctionList.Last().ControlStructures.Add(new Pair<string, int>("Else If", context.Start.Line));
+
+            Visit(context.body());
+        }
+
+        return _programData;
     }
 
     public override ProgramData VisitElse_statement([NotNull] CustomLanguageParser.Else_statementContext context)
     {
-        int line = context.Start.Line;
+        if(context.ELSE() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: ELSE| LEXEM: else| Line: {context.Start.Line}>");
 
-        string token = "ELSE";
+            if (context.body() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing body..");
 
-        string lexem = "else";
+            _programData.FunctionList.Last().ControlStructures.Add(new Pair<string, int>("Else", context.Start.Line));
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.body());
+        }
 
-        _programData.WriteLexic(format);
 
-        return VisitChildren(context);
+        return _programData;
     }
 
     public override ProgramData VisitLoop([NotNull] CustomLanguageParser.LoopContext context)
@@ -151,465 +314,904 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         return VisitChildren(context);
     }
 
+    public override ProgramData VisitCode_line([NotNull] CustomLanguageParser.Code_lineContext context) 
+    {
+        VisitChildren(context);
+
+        if (context.SEMICOLON == null)
+        {
+            throw new Exception($"At Line {context.Start.Line}: Missing semicolon..");
+        }
+        else
+            _programData.WriteLexic($"<TOKEN: SEMICOLON | LEXEM: ; | Line: {context.Start.Line}>");
+
+        return _programData;
+    }
+
     public override ProgramData VisitAditionThenEqExp([NotNull] CustomLanguageParser.AditionThenEqExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.EQADD() != null)
+        {
+            if (context.name() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
-        string token = "EQADD";
+            Visit(context.name());
 
-        string lexem = "+=";
+            Visit(context.EQADD());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            _programData.WriteLexic($"<TOKEN: EQADD | LEXEM: += | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        return VisitChildren(context);
+            Visit(context.instruction());
+        }
+
+        return _programData;
     }
 
     public override ProgramData VisitSubtractThenEqExp([NotNull] CustomLanguageParser.SubtractThenEqExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.EQSUB() != null)
+        {
+            if (context.name() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
-        string token = "EQSUB";
+            Visit(context.name());
 
-        string lexem = "-=";
+            Visit(context.EQSUB());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            _programData.WriteLexic($"<TOKEN: EQSUB | LEXEM: -= | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        return VisitChildren(context);
+            Visit(context.instruction());
+        }
+
+        return _programData;
     }
 
     public override ProgramData VisitMultiplyThenEqExp([NotNull] CustomLanguageParser.MultiplyThenEqExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.EQMUL() != null)
+        {
+            if (context.name() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
-        string token = "EQMUL";
+            Visit(context.name());
 
-        string lexem = "*=";
+            Visit(context.EQMUL());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            _programData.WriteLexic($"<TOKEN: EQMUL | LEXEM: *= | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        return VisitChildren(context);
+            Visit(context.instruction());
+        }
+
+        return _programData;
     }
 
     public override ProgramData VisitDivideThenEqExp([NotNull] CustomLanguageParser.DivideThenEqExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.EQDIV() != null)
+        {
+            if (context.name() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
-        string token = "EQDIV";
+            Visit(context.name());
 
-        string lexem = "/=";
+            Visit(context.EQDIV());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            _programData.WriteLexic($"<TOKEN: EQDIV | LEXEM: /= | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        return VisitChildren(context);
+            Visit(context.instruction());
+        }
+
+        return _programData;
     }
 
     public override ProgramData VisitModuloThenEqExp([NotNull] CustomLanguageParser.ModuloThenEqExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.EQMOD() != null)
+        {
+            if (context.name() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
-        string token = "MOD";
+            Visit(context.name());
 
-        string lexem = "%=";
+            Visit(context.EQMOD());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            _programData.WriteLexic($"<TOKEN: EQMOD | LEXEM: %= | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        return VisitChildren(context);
+            Visit(context.instruction());
+        }
+
+        return _programData;
     }
 
     public override ProgramData VisitEqualExp([NotNull] CustomLanguageParser.EqualExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.EQUAL() != null)
+        {
+            if (context.name() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
-        string token = "EQUAL";
+            Visit(context.name());
 
-        string lexem = "=";
+            Visit(context.EQUAL());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            _programData.WriteLexic($"<TOKEN: EQUAL | LEXEM: = | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        return VisitChildren(context);
+            Visit(context.instruction());
+        }
+
+        return _programData;
     }
 
     public override ProgramData VisitParam_decl([NotNull] CustomLanguageParser.Param_declContext context)
     {
+        _declareTypeName = true;
+        _inGlobalScope = false;
+        _inAntet = true;
+        _declareValue = false;
 
-        return VisitChildren(context);
+        if (context.init_param() != null)
+            VisitChildren(context);
+        else if (context.other_param() != null)
+            throw new Exception($"At Line {context.Start.Line}: Missing parameter..");
+
+        _declareTypeName = false;
+        _inAntet = false;
+
+        return _programData;
     }
 
+    public override ProgramData VisitOther_param([NotNull] CustomLanguageParser.Other_paramContext context)
+    {
+        if(context.COMMA() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: COMMA | LEXEM: , | Line: {context.Start.Line}>");
+
+            if (context.init_param() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing type assingment..");
+
+            Visit(context.init_param());
+        }
+
+        return _programData;
+    }
+
+    public override ProgramData VisitInit_param([NotNull] CustomLanguageParser.Init_paramContext context) 
+    {
+        Visit(context.data_type());
+        Visit(context.name());
+
+        return _programData;
+    }
     public override ProgramData VisitVar_decl([NotNull] CustomLanguageParser.Var_declContext context)
-    {   
+    { 
+        VisitChildren(context);
 
-        return VisitChildren(context);
+        return _programData;
     }
-    
+
+    public override ProgramData VisitOther_var([NotNull] CustomLanguageParser.Other_varContext context)
+    {
+        if (context.COMMA() != null)
+        {
+            Variable chainVar = new Variable();
+
+            chainVar.VariableType = _variables.Last().VariableType;
+
+            _programData.WriteLexic($"<TOKEN: COMMA | LEXEM: , | Line: {context.Start.Line}>");
+
+            if (context.init_var() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing value assingment..");
+
+            chainVar.VariableType = _variables.Last().VariableType;
+
+            _variables.Add(chainVar);
+
+            Visit(context.init_var());
+        }
+
+        return _programData;
+    }
+
+    public override ProgramData VisitInit_var([NotNull] CustomLanguageParser.Init_varContext context)
+    {
+        _declareTypeName = true;
+
+        Visit(context.name());
+
+        _declareTypeName = false;
+
+        if(context.EQUAL() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: EQUAL | LEXEM: = | Line: {context.Start.Line}>");
+
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing value assingment..");
+            
+            _declareValue = true;
+
+            Visit(context.instruction());
+
+            _declareValue = false;
+
+        }
+
+        return _programData;
+    }
+
     public override ProgramData VisitSmallerEqExp([NotNull] CustomLanguageParser.SmallerEqExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.SMALLER_EQ() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "SMALLER_EQ";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "<=";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.SMALLER_EQ());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: SMALLER_EQ | LEXEM: <= | Line: {context.Start.Line}>");
+
+
+            Visit(context.instruction(1));
+
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitPreincrementExp([NotNull] CustomLanguageParser.PreincrementExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.INCREMENT() != null)
+        {
+            Visit(context.INCREMENT());
 
-        string token = "INCREMENT";
+            _programData.WriteLexic($"<TOKEN: INCREMENT | LEXEM: ++& | Line: {context.Start.Line}>");
 
-        string lexem = "&++";
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        _programData.WriteLexic(format);
+            Visit(context.instruction());
+        }
 
-        return VisitChildren(context);
+        return _programData;
     }
 
     public override ProgramData VisitVariableAtomExp([NotNull] CustomLanguageParser.VariableAtomExpContext context)
     {
-        return VisitChildren(context);
+        Visit(context.name());
+        if(_declareValue)
+            _declareValue = false;
+
+        return _programData;
     }
     
     public override ProgramData VisitValueAtomEXp([NotNull] CustomLanguageParser.ValueAtomEXpContext context)
     {
-        return VisitChildren(context);
+        Visit(context.data_value());
+        
+        return _programData;
     }
 
     public override ProgramData VisitPredecrementExp([NotNull] CustomLanguageParser.PredecrementExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.DECREMENT() != null)
+        {
+            Visit(context.DECREMENT());
 
-        string token = "DEC";
+            _programData.WriteLexic($"<TOKEN: DECREMENT | LEXEM: --& | Line: {context.Start.Line}>");
 
-        string lexem = "--&";
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        _programData.WriteLexic(format);
+            Visit(context.instruction());
+        }
 
-        return VisitChildren(context);
+        return _programData;
     }
 
     public override ProgramData VisitLogicNotExp([NotNull] CustomLanguageParser.LogicNotExpContext context)
     {
-        int line = context.Start.Line;
+        if(context.NOT() != null)
+        {
+            Visit(context.NOT());
 
-        string token = "NOT";
+            _programData.WriteLexic($"<TOKEN: NOT | LEXEM: ! | Line: {context.Start.Line}>");
 
-        string lexem = "!";
+            if(context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        _programData.WriteLexic(format);
+            Visit(context.instruction());
+        }
 
-        return VisitChildren(context);
+        return _programData;
     }
     
     public override ProgramData VisitFunctionCallExp([NotNull] CustomLanguageParser.FunctionCallExpContext context)
     {
-        
+        Visit(context.name());
 
-        return VisitChildren(context);
+        if(context.OPENPTHS() != null)
+        {
+            if(context.CLOSEPTHS() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing closed brackets");
+
+            _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: ( | Line: {context.Start.Line}>");
+
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
+
+            if (context.instruction_list() != null)
+            {
+                Visit(context.instruction_list());
+            }
+
+
+            _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | Line: {context.Start.Line}>");
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitPostdecrementExp([NotNull] CustomLanguageParser.PostdecrementExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.DECREMENT() != null)
+        {
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "DEC";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string lexem = "&--";
+            Visit(context.instruction());
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.DECREMENT());
 
-        _programData.WriteLexic(format);
+            _programData.WriteLexic($"<TOKEN: DECREMENT | LEXEM: &-- | Line: {context.Start.Line}>");
 
-        return VisitChildren(context);
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitModuloExp([NotNull] CustomLanguageParser.ModuloExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.MOD() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "MOD";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "%";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.MOD());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: MOD | LEXEM: - | Line: {context.Start.Line}>");
+
+
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitGreaterEqExp([NotNull] CustomLanguageParser.GreaterEqExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.GREATER_EQ() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "GREATER_EQ";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = ">=";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.GREATER_EQ());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: GREATER_EQ | LEXEM: >= | Line: {context.Start.Line}>");
+
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitSmallerExp([NotNull] CustomLanguageParser.SmallerExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.SMALLER() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "SMALLER";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "<";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.SMALLER());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: SMALLER | LEXEM: < | Line: {context.Start.Line}>");
+
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitGreaterExp([NotNull] CustomLanguageParser.GreaterExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.GREATER() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "GREATER";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = ">";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.GREATER());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: GREATER | LEXEM: > | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitLogicAndExp([NotNull] CustomLanguageParser.LogicAndExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.AND() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "AND";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "&&";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.AND());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: AND | LEXEM: && | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitLogicOrExp([NotNull] CustomLanguageParser.LogicOrExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.OR() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "OR";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "||";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.OR());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: OR | LEXEM: || | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitParanhesisExp([NotNull] CustomLanguageParser.ParanhesisExpContext context)
     {
-        
+        if (context.OPENPTHS() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: ( | LINE: {context.Start.Line}>");
 
-        return VisitChildren(context);
+            if(context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction");
+
+            if (context.CLOSEPTHS() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing closed brackets");
+
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
+
+            Visit(context.instruction());
+            _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | LINE: {context.Start.Line}>");
+        }
+
+        return _programData;
     }
    
     public override ProgramData VisitSubtractExp([NotNull] CustomLanguageParser.SubtractExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.SUB() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "SUB";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "-";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.SUB());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: SUB | LEXEM: - | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitSameValueExp([NotNull] CustomLanguageParser.SameValueExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.SAME() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "DIFF";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "!=";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.SAME());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: SAME | LEXEM: == | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitDiffValueExp([NotNull] CustomLanguageParser.DiffValueExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.DIFF() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "DIFF";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "!=";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.DIFF());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: DIFF | LEXEM: != | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitMultiplyExp([NotNull] CustomLanguageParser.MultiplyExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.MUL() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "MUL";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "*";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.MUL());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: MUL | LEXEM: * | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitDivideExp([NotNull] CustomLanguageParser.DivideExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.DIV() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "DIV";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "/";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.DIV());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: DIV | LEXEM: / | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitAditionExp([NotNull] CustomLanguageParser.AditionExpContext context)
     {
-        int line = context.Start.Line;
+        if (context.ADD() != null)
+        {
+            if (context.instruction(0) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string token = "ADD";
+            if (context.instruction(1) == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-        string lexem = "+";
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+            Visit(context.instruction(0));
 
-        _programData.WriteLexic(format);
+            Visit(context.ADD());
 
-        return VisitChildren(context);
+            _programData.WriteLexic($"<TOKEN: ADD | LEXEM: + | Line: {context.Start.Line}>");
+            Visit(context.instruction(1));
+        }
+
+        return _programData;
     }
     
     public override ProgramData VisitPostincrementExp([NotNull] CustomLanguageParser.PostincrementExpContext context)
     {
-        int line = context.Start.Line;
-
-        string token = "INCREMENT";
-
-        string lexem = "&++";
-
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
-
-        _programData.WriteLexic(format);
-
-        return VisitChildren(context); 
-    }
-
-    public override ProgramData VisitReturn_type([NotNull] CustomLanguageParser.Return_typeContext context) 
-    {
-        if (context.VOID_TYPE() != null)
+        if (context.INCREMENT() != null)
         {
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
-            int line = context.Start.Line;
+            if (_declareValue)
+            {
+                _declareValue = false;
+                _variables.Last().Value = context.GetText();
+            }
 
-            string token = "NAME";
+            Visit(context.instruction());
 
-            string lexem = context.GetText();
+            Visit(context.INCREMENT());
 
-            string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
-
-            _programData.WriteLexic(format);
+            _programData.WriteLexic($"<TOKEN: INCREMENT | LEXEM: &++ | Line: {context.Start.Line}>");
         }
 
-        return VisitChildren(context);
+        return _programData;
     }
-    
-    public override ProgramData VisitData_type([NotNull] CustomLanguageParser.Data_typeContext context)
+
+    public override ProgramData VisitInstruction_list([NotNull] CustomLanguageParser.Instruction_listContext context)
     {
-        int line = context.Start.Line;
+        VisitChildren(context);
+
+        return _programData;
+    }
+
+    public override ProgramData VisitOther_instructions([NotNull] CustomLanguageParser.Other_instructionsContext context)
+    {
+        if(context.COMMA() != null)
+        {
+            _programData.WriteLexic($"<TOKEN: COMMA | LEXEM: , | Line: {context.Start.Line}>");
+
+            if (context.instruction() == null)
+                throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
+
+            Visit(context.instruction());
+        }
+
+        return _programData;
+    }
+
+    public override ProgramData VisitReturn_type([NotNull] CustomLanguageParser.Return_typeContext context) //Done
+    {
+        //Console.WriteLine($"Return Type at {context.Start.Line}");
         string token = "";
 
-        if (context.INTEGER_TYPE() != null)
+        string lexem = "";
+
+        if (context.VOID_TYPE() != null)
         {
-            _programData.Variables.Add(new ProgramData.Variable { VariableType = ProgramData.Type.Int });
-            token = ProgramData.Type.Int.ToString();
-            token = "INT";
+            _programData.FunctionList.Last().ReturnType = ProgramData.ReturnType.Void;
+            token = "VOID_TYPE";
         }
-        else if (context.FLOAT_TYPE() != null)
+        else if(context.INTEGER_TYPE() != null)
         {
-            _programData.Variables.Add(new ProgramData.Variable { VariableType = ProgramData.Type.Float });
-            token = ProgramData.Type.Float.ToString();
-            token = "FLOAT";
-        }
-        else if (context.DOUBLE_TYPE() != null)
-        {
-            _programData.Variables.Add(new ProgramData.Variable { VariableType = ProgramData.Type.Double });
-            token = ProgramData.Type.Double.ToString();
-            token = "DOUBLE";
+            _programData.FunctionList.Last().ReturnType = ProgramData.ReturnType.Int;
+            token = "INT_TYPE";
         }
         else if (context.STRING_TYPE() != null)
         {
-            _programData.Variables.Add(new ProgramData.Variable { VariableType = ProgramData.Type.String });
-            token = ProgramData.Type.String.ToString();
+            _programData.FunctionList.Last().ReturnType = ProgramData.ReturnType.String;
+            token = "STRING_TYPE";
+        }
+        else if (context.DOUBLE_TYPE() != null)
+        {
+            _programData.FunctionList.Last().ReturnType = ProgramData.ReturnType.Double;
+            token = "DOUBLE_TYPE";
+        }
+        else if (context.FLOAT_TYPE() != null)
+        {
+            _programData.FunctionList.Last().ReturnType = ProgramData.ReturnType.Float;
+            token = "FLOAT_TYPE";
+        }
+        else
+        {
+            throw new Exception("Invalid return type");
+        }
+        lexem = context.GetText();
+
+        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
+
+        return _programData;
+    }
+    
+    public override ProgramData VisitData_type([NotNull] CustomLanguageParser.Data_typeContext context) //Done
+    {
+        var token = "";
+
+        ProgramData.Variable varDefinition = new ProgramData.Variable();
+
+        if (context.INTEGER_TYPE() != null)
+        {
+            //token = ProgramData.ReturnType.Int.ToString();
+            token = "INT";
+            varDefinition.VariableType = ProgramData.ReturnType.Int;
+        }
+        else if (context.FLOAT_TYPE() != null)
+        {
+            //token = ProgramData.ReturnType.Float.ToString();
+            token = "FLOAT";
+            varDefinition.VariableType = ProgramData.ReturnType.Float;
+        }
+        else if (context.DOUBLE_TYPE() != null)
+        {
+            //token = ProgramData.ReturnType.Double.ToString();
+            token = "DOUBLE";
+            varDefinition.VariableType = ProgramData.ReturnType.Double;
+        }
+        else if (context.STRING_TYPE() != null)
+        {
+            //token = ProgramData.ReturnType.String.ToString();
             token = "STRING";
+            varDefinition.VariableType = ProgramData.ReturnType.String;
+        }
+        else
+        {
+            throw new Exception("Invalid data type");
         }
 
         string lexem = context.GetText();
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
+        _variables.Add( varDefinition );
 
-        return VisitChildren(context);
+        return _programData;
     }
 
     public override ProgramData VisitData_value([NotNull] CustomLanguageParser.Data_valueContext context)
     {
-        int line = context.Start.Line;
         string token = "";
-
 
         if (context.INTEGER_VALUE() != null)
         {
@@ -632,26 +1234,56 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         }
         string lexem = context.GetText();
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+        _programData.WriteLexic($"<TOKEN: {token}| LEXEM: {lexem}| Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
-
+        if (_declareValue)
+        {
+            _declareValue = false;
+            _variables.Last().Value = lexem;
+        }
 
         return VisitChildren(context);
     }
 
     public override ProgramData VisitName([NotNull] CustomLanguageParser.NameContext context)
     {
-        int line = context.Start.Line;
-
         string token = "NAME";
+        string lexem = "";
 
-        string lexem = context.GetText();
+        if (context.NAME() != null)
+        {
+            lexem = context.NAME().GetText();
+        }
+        else
+        {
+            throw new Exception($"At Line {context.Start.Line}: Invalid variable name..");
+        }
 
-        string format = $"<TOKEN: {token}| LEXEM: {lexem}| Line: {line}>";
+        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
 
-        _programData.WriteLexic(format);
- 
-        return VisitChildren(context);
+        if (_declareValue)
+        {
+            _variables.Last().Value = lexem;
+        }
+
+        if (_declareTypeName)
+        {
+            _variables.Last().Name = lexem;
+
+            if (_inGlobalScope)
+            {
+                _programData.GlobalVariables.Add(_variables.Last());
+            }
+            else if(_inAntet) 
+            {
+                _programData.FunctionList.Last().Parameters.Add(_variables.Last());
+            }
+            else
+            {
+                _programData.FunctionList.Last().Variables.Add(_variables.Last());
+            }
+        }
+
+        return _programData;
     }
 }

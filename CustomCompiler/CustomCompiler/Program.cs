@@ -20,10 +20,51 @@ public class Program
             CommonTokenStream commonTokenStream = new CommonTokenStream(ifConditionLexer);
             CustomLanguageParser parser = new CustomLanguageParser(commonTokenStream);
 
+
             CustomLanguageParser.Base_structureContext context = parser.base_structure();
             CustomCompilerVisitor visitor = new CustomCompilerVisitor();
             var restult = visitor.Visit(context);
+
+            StreamWriter writeGlobals = new StreamWriter("../../../globals.txt");
+
+            foreach (var global in restult.GlobalVariables)
+            {
+                writeGlobals.WriteLine(global.ToString());
+                writeGlobals.Flush();
+            }
+
+            writeGlobals.Close();
+
+            StreamWriter writeFunc = new StreamWriter("../../../functions.txt");
             
+            foreach (var func in restult.FunctionList)
+            {
+                writeFunc.WriteLine(func.ToString());
+                writeFunc.Flush();
+                writeFunc.WriteLine("Parameters: ");
+                foreach (var param in func.Parameters)
+                {
+                    writeFunc.WriteLine("--> " + param.ToString());
+                    writeFunc.Flush();
+                }
+                writeFunc.WriteLine("Variables: ");
+                foreach (var variable in func.Variables)
+                {
+                    writeFunc.WriteLine("--> " + variable.ToString());
+                    writeFunc.Flush();
+                }
+
+                writeFunc.WriteLine("Control Structures: ");
+                foreach(var control in func.ControlStructures)
+                {
+                    writeFunc.WriteLine(control.ToString());
+                    writeFunc.Flush();
+                }
+
+                writeFunc.WriteLine();
+            }
+
+            writeFunc.Close();
         }
         catch (Exception ex)
         {

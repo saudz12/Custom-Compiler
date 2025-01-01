@@ -1,0 +1,31 @@
+<return>(Int) <name>(addIntegers) : <type>(Normal) <iteration>())
+Parameters: 
+--> <type>(Int) <name>(first) <value>()
+--> <type>(Int) <name>(second) <value>()
+Variables: 
+Control Structures: 
+
+<return>(Float) <name>(divideIntegers) : <type>(Normal) <iteration>())
+Parameters: 
+--> <type>(Int) <name>(first) <value>()
+--> <type>(Int) <name>(second) <value>()
+Variables: 
+Control Structures: 
+(If, 8)
+
+<return>(Int) <name>(main) : <type>(Main) <iteration>(Iterative))
+Parameters: 
+--> <type>(Int) <name>(x) <value>()
+--> <type>(Int) <name>(y) <value>()
+Variables: 
+--> <type>(Int) <name>(myFirstVariable) <value>(17)
+--> <type>(Float) <name>(mySecondVariable) <value>(45)
+--> <type>(String) <name>(myThirdVariable) <value>("3")
+--> <type>(Int) <name>(i) <value>(0)
+--> <type>(String) <name>(myString) <value>("")
+--> <type>(Int) <name>(temp) <value>(myFirstVariable+5)
+--> <type>(Float) <name>(myFloat) <value>(divideIntegers(myThirdVariable,myFirstVariable))
+Control Structures: 
+(If, 30)
+(Else, 35)
+

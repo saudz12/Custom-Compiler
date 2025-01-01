@@ -1,96 +1,151 @@
-<TOKEN: INT| LEXEM: int| Line: 1>
-<TOKEN: NAME| LEXEM: addIntegers| Line: 1>
-<TOKEN: INT| LEXEM: int| Line: 1>
-<TOKEN: NAME| LEXEM: first| Line: 1>
-<TOKEN: INT| LEXEM: int| Line: 1>
-<TOKEN: NAME| LEXEM: second| Line: 1>
+<TOKEN: INT_TYPE | LEXEM: int | Line: 1>
+<TOKEN: NAME | LEXEM: addIntegers | LINE: 1>
+<TOKEN: OPENPTHS | LEXEM: ( | LINE: 1>
+<TOKEN: INT | LEXEM: int | Line: 1>
+<TOKEN: NAME | LEXEM: first | Line: 1>
+<TOKEN: COMMA | LEXEM: , | Line: 1>
+<TOKEN: INT | LEXEM: int | Line: 1>
+<TOKEN: NAME | LEXEM: second | Line: 1>
+<TOKEN: CLOSEPTHS | LEXEM: ) | LINE: 1>
+<TOKEN: OPENBLOCK | LEXEM: { | LINE: 2>
 <TOKEN: RETURN| LEXEM: return| Line: 3>
-<TOKEN: ADD| LEXEM: +| Line: 3>
-<TOKEN: NAME| LEXEM: first| Line: 3>
-<TOKEN: NAME| LEXEM: second| Line: 3>
-<TOKEN: FLOAT| LEXEM: float| Line: 6>
-<TOKEN: NAME| LEXEM: divideIntegers| Line: 6>
-<TOKEN: INT| LEXEM: int| Line: 6>
-<TOKEN: NAME| LEXEM: first| Line: 6>
-<TOKEN: INT| LEXEM: int| Line: 6>
-<TOKEN: NAME| LEXEM: second| Line: 6>
-<TOKEN: IF| LEXEM: return| Line: 8>
-<TOKEN: DIFF| LEXEM: !=| Line: 8>
-<TOKEN: NAME| LEXEM: second| Line: 8>
+<TOKEN: NAME | LEXEM: first | Line: 3>
+<TOKEN: ADD | LEXEM: + | Line: 3>
+<TOKEN: NAME | LEXEM: second | Line: 3>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 3>
+<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 4>
+<TOKEN: FLOAT_TYPE | LEXEM: float | Line: 6>
+<TOKEN: NAME | LEXEM: divideIntegers | LINE: 6>
+<TOKEN: OPENPTHS | LEXEM: ( | LINE: 6>
+<TOKEN: INT | LEXEM: int | Line: 6>
+<TOKEN: NAME | LEXEM: first | Line: 6>
+<TOKEN: COMMA | LEXEM: , | Line: 6>
+<TOKEN: INT | LEXEM: int | Line: 6>
+<TOKEN: NAME | LEXEM: second | Line: 6>
+<TOKEN: CLOSEPTHS | LEXEM: ) | LINE: 6>
+<TOKEN: OPENBLOCK | LEXEM: { | LINE: 7>
+<TOKEN: IF | LEXEM: if | Line: 8>
+<TOKEN: OPENPTHS | LEXEM: ( | Line: 8>
+<TOKEN: NAME | LEXEM: second | Line: 8>
+<TOKEN: SAME | LEXEM: == | Line: 8>
 <TOKEN: INT| LEXEM: 0| Line: 8>
-<TOKEN: RETURN| LEXEM: return| Line: 10>
-<TOKEN: INT| LEXEM: 0| Line: 10>
-<TOKEN: ELSE_IF| LEXEM: else if| Line: 12>
-<TOKEN: ELSE| LEXEM: else| Line: 12>
+<TOKEN: CLOSEPTHS | LEXEM: ) | Line: 8>
 <TOKEN: RETURN| LEXEM: return| Line: 12>
-<TOKEN: DIV| LEXEM: /| Line: 12>
-<TOKEN: NAME| LEXEM: first| Line: 12>
-<TOKEN: NAME| LEXEM: second| Line: 12>
-<TOKEN: DOUBLE| LEXEM: double| Line: 15>
-<TOKEN: NAME| LEXEM: globalVariable| Line: 15>
+<TOKEN: NAME | LEXEM: first | Line: 12>
+<TOKEN: DIV | LEXEM: / | Line: 12>
+<TOKEN: NAME | LEXEM: second | Line: 12>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 12>
+<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 13>
+<TOKEN: DOUBLE | LEXEM: double | Line: 15>
+<TOKEN: NAME | LEXEM: globalVariable | Line: 15>
+<TOKEN: EQUAL | LEXEM: = | Line: 15>
 <TOKEN: FLOAT| LEXEM: 15.67| Line: 15>
-<TOKEN: MAIN_FUNC| LEXEM: main| Line: 17>
-<TOKEN: INT| LEXEM: int| Line: 17>
-<TOKEN: INT| LEXEM: int| Line: 19>
-<TOKEN: NAME| LEXEM: myFirstVariable| Line: 19>
+<TOKEN: COMMA | LEXEM: , | Line: 15>
+<TOKEN: NAME | LEXEM: secondGlobal | Line: 15>
+<TOKEN: EQUAL | LEXEM: = | Line: 15>
+<TOKEN: FLOAT| LEXEM: 123.12| Line: 15>
+<TOKEN: SEMICOLON | LEXEM: ; | LINE: 15>
+<TOKEN: INT_TYPE | LEXEM: int | Line: 17>
+<TOKEN: MAIN_FUNC | LEXEM: main | Line: 17>
+<TOKEN: OPENPTHS | LEXEM: ( | LINE: 17>
+<TOKEN: INT | LEXEM: int | Line: 17>
+<TOKEN: NAME | LEXEM: x | Line: 17>
+<TOKEN: COMMA | LEXEM: , | Line: 17>
+<TOKEN: INT | LEXEM: int | Line: 17>
+<TOKEN: NAME | LEXEM: y | Line: 17>
+<TOKEN: CLOSEPTHS | LEXEM: ) | LINE: 17>
+<TOKEN: OPENBLOCK | LEXEM: { | LINE: 18>
+<TOKEN: INT | LEXEM: int | Line: 19>
+<TOKEN: NAME | LEXEM: myFirstVariable | Line: 19>
+<TOKEN: EQUAL | LEXEM: = | Line: 19>
 <TOKEN: INT| LEXEM: 17| Line: 19>
-<TOKEN: FLOAT| LEXEM: float| Line: 20>
-<TOKEN: NAME| LEXEM: mySecondVariable| Line: 20>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 19>
+<TOKEN: FLOAT | LEXEM: float | Line: 20>
+<TOKEN: NAME | LEXEM: mySecondVariable | Line: 20>
+<TOKEN: EQUAL | LEXEM: = | Line: 20>
 <TOKEN: INT| LEXEM: 45| Line: 20>
-<TOKEN: STRING| LEXEM: string| Line: 21>
-<TOKEN: NAME| LEXEM: myThirdVariable| Line: 21>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 20>
+<TOKEN: STRING | LEXEM: string | Line: 21>
+<TOKEN: NAME | LEXEM: myThirdVariable | Line: 21>
+<TOKEN: EQUAL | LEXEM: = | Line: 21>
 <TOKEN: STRING| LEXEM: "3"| Line: 21>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 21>
 <TOKEN: FOR_LOOP| LEXEM: for| Line: 23>
-<TOKEN: INT| LEXEM: int| Line: 23>
-<TOKEN: NAME| LEXEM: i| Line: 23>
+<TOKEN: INT | LEXEM: int | Line: 23>
+<TOKEN: NAME | LEXEM: i | Line: 23>
+<TOKEN: EQUAL | LEXEM: = | Line: 23>
 <TOKEN: INT| LEXEM: 0| Line: 23>
-<TOKEN: SMALLER| LEXEM: <| Line: 23>
-<TOKEN: NAME| LEXEM: i| Line: 23>
-<TOKEN: NAME| LEXEM: myThirdVariable| Line: 23>
-<TOKEN: INCREMENT| LEXEM: &++| Line: 23>
-<TOKEN: NAME| LEXEM: i| Line: 23>
-<TOKEN: EQADD| LEXEM: +=| Line: 25>
-<TOKEN: NAME| LEXEM: myFirstVariable| Line: 25>
-<TOKEN: NAME| LEXEM: i| Line: 25>
-<TOKEN: STRING| LEXEM: string| Line: 28>
-<TOKEN: NAME| LEXEM: myString| Line: 28>
+<TOKEN: NAME | LEXEM: i | Line: 23>
+<TOKEN: SMALLER | LEXEM: < | Line: 23>
+<TOKEN: NAME | LEXEM: myThirdVariable | Line: 23>
+<TOKEN: NAME | LEXEM: i | Line: 23>
+<TOKEN: INCREMENT | LEXEM: &++ | Line: 23>
+<TOKEN: OPENBLOCK | LEXEM: { | LINE: 24>
+<TOKEN: NAME | LEXEM: myFirstVariable | Line: 25>
+<TOKEN: EQADD | LEXEM: += | Line: 25>
+<TOKEN: NAME | LEXEM: i | Line: 25>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 25>
+<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 26>
+<TOKEN: STRING | LEXEM: string | Line: 28>
+<TOKEN: NAME | LEXEM: myString | Line: 28>
+<TOKEN: EQUAL | LEXEM: = | Line: 28>
 <TOKEN: STRING| LEXEM: ""| Line: 28>
-<TOKEN: IF| LEXEM: return| Line: 30>
-<TOKEN: AND| LEXEM: &&| Line: 30>
-<TOKEN: GREATER_EQ| LEXEM: >=| Line: 30>
-<TOKEN: NAME| LEXEM: myFirstVariable| Line: 30>
-<TOKEN: NAME| LEXEM: mySecondVariable| Line: 30>
-<TOKEN: DIFF| LEXEM: !=| Line: 30>
-<TOKEN: NAME| LEXEM: globalVariable| Line: 30>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 28>
+<TOKEN: IF | LEXEM: if | Line: 30>
+<TOKEN: OPENPTHS | LEXEM: ( | Line: 30>
+<TOKEN: NAME | LEXEM: myFirstVariable | Line: 30>
+<TOKEN: GREATER_EQ | LEXEM: >= | Line: 30>
+<TOKEN: NAME | LEXEM: mySecondVariable | Line: 30>
+<TOKEN: AND | LEXEM: && | Line: 30>
+<TOKEN: NAME | LEXEM: globalVariable | Line: 30>
+<TOKEN: DIFF | LEXEM: != | Line: 30>
 <TOKEN: FLOAT| LEXEM: 16.54| Line: 30>
-<TOKEN: EQUAL| LEXEM: =| Line: 32>
-<TOKEN: NAME| LEXEM: myString| Line: 32>
-<TOKEN: STRING| LEXEM: "Both conditions are true"| Line: 32>
-<TOKEN: ELSE_IF| LEXEM: else if| Line: 35>
+<TOKEN: CLOSEPTHS | LEXEM: ) | Line: 30>
 <TOKEN: ELSE| LEXEM: else| Line: 35>
-<TOKEN: EQUAL| LEXEM: =| Line: 37>
-<TOKEN: NAME| LEXEM: myString| Line: 37>
+<TOKEN: OPENBLOCK | LEXEM: { | LINE: 36>
+<TOKEN: NAME | LEXEM: myString | Line: 37>
+<TOKEN: EQUAL | LEXEM: = | Line: 37>
 <TOKEN: STRING| LEXEM: "At least one of the conditions is false"| Line: 37>
-<TOKEN: INT| LEXEM: int| Line: 38>
-<TOKEN: NAME| LEXEM: temp| Line: 38>
-<TOKEN: ADD| LEXEM: +| Line: 38>
-<TOKEN: NAME| LEXEM: myFirstVariable| Line: 38>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 37>
+<TOKEN: INT | LEXEM: int | Line: 38>
+<TOKEN: NAME | LEXEM: temp | Line: 38>
+<TOKEN: EQUAL | LEXEM: = | Line: 38>
+<TOKEN: NAME | LEXEM: myFirstVariable | Line: 38>
+<TOKEN: ADD | LEXEM: + | Line: 38>
 <TOKEN: INT| LEXEM: 5| Line: 38>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 38>
+<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 39>
 <TOKEN: FOR_WHILE| LEXEM: while| Line: 41>
-<TOKEN: NAME| LEXEM: true| Line: 41>
+<TOKEN: NAME | LEXEM: true | Line: 41>
+<TOKEN: OPENBLOCK | LEXEM: { | LINE: 41>
 <TOKEN: FOR_WHILE| LEXEM: while| Line: 42>
-<TOKEN: NAME| LEXEM: true| Line: 42>
+<TOKEN: NAME | LEXEM: true | Line: 42>
+<TOKEN: OPENBLOCK | LEXEM: { | LINE: 42>
 <TOKEN: RETURN| LEXEM: return| Line: 43>
 <TOKEN: INT| LEXEM: 1| Line: 43>
-<TOKEN: EQUAL| LEXEM: =| Line: 47>
-<TOKEN: NAME| LEXEM: myThirdVariable| Line: 47>
-<TOKEN: NAME| LEXEM: addIntegers| Line: 47>
-<TOKEN: NAME| LEXEM: myFirstVariable| Line: 47>
-<TOKEN: NAME| LEXEM: mySecondVariable| Line: 47>
-<TOKEN: FLOAT| LEXEM: float| Line: 49>
-<TOKEN: NAME| LEXEM: myFloat| Line: 49>
-<TOKEN: NAME| LEXEM: divideIntegers| Line: 49>
-<TOKEN: NAME| LEXEM: myThirdVariable| Line: 49>
-<TOKEN: NAME| LEXEM: myFirstVariable| Line: 49>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 43>
+<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 44>
+<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 45>
+<TOKEN: NAME | LEXEM: myThirdVariable | Line: 47>
+<TOKEN: EQUAL | LEXEM: = | Line: 47>
+<TOKEN: NAME | LEXEM: addIntegers | Line: 47>
+<TOKEN: OPENPTHS | LEXEM: ( | Line: 47>
+<TOKEN: NAME | LEXEM: myFirstVariable | Line: 47>
+<TOKEN: COMMA | LEXEM: , | Line: 47>
+<TOKEN: NAME | LEXEM: mySecondVariable | Line: 47>
+<TOKEN: CLOSEPTHS | LEXEM: ) | Line: 47>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 47>
+<TOKEN: FLOAT | LEXEM: float | Line: 49>
+<TOKEN: NAME | LEXEM: myFloat | Line: 49>
+<TOKEN: EQUAL | LEXEM: = | Line: 49>
+<TOKEN: NAME | LEXEM: divideIntegers | Line: 49>
+<TOKEN: OPENPTHS | LEXEM: ( | Line: 49>
+<TOKEN: NAME | LEXEM: myThirdVariable | Line: 49>
+<TOKEN: COMMA | LEXEM: , | Line: 49>
+<TOKEN: NAME | LEXEM: myFirstVariable | Line: 49>
+<TOKEN: CLOSEPTHS | LEXEM: ) | Line: 49>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 49>
 <TOKEN: RETURN| LEXEM: return| Line: 51>
 <TOKEN: INT| LEXEM: 0| Line: 51>
+<TOKEN: SEMICOLON | LEXEM: ; | Line: 51>
+<TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 52>

@@ -4,37 +4,40 @@ grammar CustomLanguage;
 
 base_structure: global main;
 
-main: data_type MAIN_FUNC '(' ')' body;
+main: return_type MAIN_FUNC OPENPTHS param_decl CLOSEPTHS body;
 
-global: (func_decl | (var_decl SEMICOLON))+?;
+global: (func_decl | global_var)*;
 
-func_decl: return_type name '(' param_decl ')' body;
+global_var: var_decl SEMICOLON;
+
+func_decl: return_type NAME OPENPTHS param_decl CLOSEPTHS body;
 
 body:
-	'{' (
-		loop
-		| if_statement
-		| attribution SEMICOLON
-		| instruction SEMICOLON
-		| return SEMICOLON
-		| var_decl SEMICOLON
-	)* '}';
+	openedblock (loop | if_statement | code_line)* closedblock;
 
-if_statement: IF '(' instruction ')' other_statements;
+openedblock: OPENEDBLOCK;
 
-other_statements: ( body else_if_statement else_statement)?;
+closedblock: CLOSEDBLOCK;
 
-else_if_statement: (ELSE_IF '(' instruction ')' body)*;
+if_statement:
+	IF OPENPTHS instruction CLOSEPTHS body other_statements;
 
-else_statement: (ELSE body)?;
+other_statements: else_if_statement* else_statement?;
+
+else_if_statement: ELSE_IF OPENPTHS instruction CLOSEPTHS body;
+
+else_statement: ELSE body;
 
 loop:
 	(
 		(
-			FOR_LOOP '(' var_decl? SEMICOLON instruction? SEMICOLON instruction? ')'
+			FOR_LOOP OPENPTHS var_decl? SEMICOLON instruction? SEMICOLON instruction? CLOSEPTHS
 		)
-		| (WHILE_LOOP '(' instruction ')')
+		| (WHILE_LOOP OPENPTHS instruction CLOSEPTHS)
 	) body;
+
+code_line:
+	(attribution | instruction | return | var_decl) SEMICOLON;
 
 return: RETURN instruction?;
 
@@ -46,38 +49,48 @@ attribution:
 	| name EQMOD instruction	# moduloThenEqExp
 	| name EQUAL instruction	# equalExp;
 
-param_decl: (data_type name (',' data_type name)*)?;
+param_decl: (init_param other_param*)?;
+other_param: COMMA init_param;
+init_param: data_type name;
 
-var_decl:
-	data_type name (EQUAL instruction)? (
-		',' name (EQUAL instruction)?
-	)?;
+var_decl: data_type init_var other_var*;
+other_var: COMMA init_var;
+init_var: name (EQUAL instruction)?;
 
 instruction:
-	name												# variableAtomExp
-	| data_value										# valueAtomEXp
-	| '(' instruction ')'								# paranhesisExp
-	| name '(' (instruction (',' instruction)*)? ')'	# functionCallExp
-	| NOT instruction									# logicNotExp
-	| INCREMENT instruction								# preincrementExp
-	| instruction INCREMENT								# postincrementExp
-	| DECREMENT instruction								# predecrementExp
-	| instruction DECREMENT								# postdecrementExp
-	| instruction ADD instruction						# aditionExp
-	| instruction SUB instruction						# subtractExp
-	| instruction MUL instruction						# multiplyExp
-	| instruction DIV instruction						# divideExp
-	| instruction MOD instruction						# moduloExp
-	| instruction SMALLER_EQ instruction				# smallerEqExp
-	| instruction GREATER_EQ instruction				# greaterEqExp
-	| instruction SMALLER instruction					# smallerExp
-	| instruction GREATER instruction					# greaterExp
-	| instruction SAME instruction						# sameValueExp
-	| instruction DIFF instruction						# diffValueExp
-	| instruction AND instruction						# logicAndExp
-	| instruction OR instruction						# logicOrExp;
+	name										# variableAtomExp
+	| data_value								# valueAtomEXp
+	| OPENPTHS instruction CLOSEPTHS			# paranhesisExp
+	| name OPENPTHS instruction_list? CLOSEPTHS	# functionCallExp
+	| NOT instruction							# logicNotExp
+	| INCREMENT instruction						# preincrementExp
+	| instruction INCREMENT						# postincrementExp
+	| DECREMENT instruction						# predecrementExp
+	| instruction DECREMENT						# postdecrementExp
+	| instruction ADD instruction				# aditionExp
+	| instruction SUB instruction				# subtractExp
+	| instruction MUL instruction				# multiplyExp
+	| instruction DIV instruction				# divideExp
+	| instruction MOD instruction				# moduloExp
+	| instruction SMALLER_EQ instruction		# smallerEqExp
+	| instruction GREATER_EQ instruction		# greaterEqExp
+	| instruction SMALLER instruction			# smallerExp
+	| instruction GREATER instruction			# greaterExp
+	| instruction SAME instruction				# sameValueExp
+	| instruction DIFF instruction				# diffValueExp
+	| instruction AND instruction				# logicAndExp
+	| instruction OR instruction				# logicOrExp;
 
-return_type: VOID_TYPE | data_type;
+instruction_list: instruction other_instructions*;
+
+other_instructions: COMMA instruction;
+
+return_type:
+	VOID_TYPE
+	| INTEGER_TYPE
+	| FLOAT_TYPE
+	| DOUBLE_TYPE
+	| STRING_TYPE;
 
 data_type:
 	INTEGER_TYPE
@@ -90,6 +103,13 @@ data_value: FLOAT_VALUE | INTEGER_VALUE | STRING_VALUE;
 name: NAME;
 
 /* Lexer rules */
+
+OPENPTHS: '(';
+CLOSEPTHS: ')';
+OPENEDBLOCK: '{';
+CLOSEDBLOCK: '}';
+COMMA: ',';
+SEMICOLON: ';';
 
 INTEGER_TYPE: 'int';
 FLOAT_TYPE: 'float';
@@ -107,8 +127,6 @@ ELSE: 'else';
 
 INCREMENT: '++';
 DECREMENT: '--';
-
-SEMICOLON: ';';
 
 MUL: '*';
 DIV: '/';

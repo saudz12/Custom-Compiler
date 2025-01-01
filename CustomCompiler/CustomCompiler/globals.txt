@@ -1,0 +1,2 @@
+<type>(Double) <name>(globalVariable) <value>(15.67)
+<type>(Double) <name>(secondGlobal) <value>(123.12)
