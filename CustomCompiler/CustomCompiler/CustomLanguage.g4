@@ -151,8 +151,8 @@ EQUAL: '=';
 
 NAME: [a-zA-Z][a-zA-Z0-9]*;
 
-INTEGER_VALUE: [0-9]+;
-FLOAT_VALUE: [0-9]+ '.' [0-9]+;
+INTEGER_VALUE: [-+]? [0-9]+;
+FLOAT_VALUE: [-+]? [0-9]+ '.' [0-9]+;
 STRING_VALUE: '""' | '"' .+? '"';
 
 BLOCK_COMMENTARY: '/*' .+? '*/'+ -> skip;

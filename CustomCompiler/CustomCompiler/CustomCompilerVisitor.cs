@@ -22,6 +22,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     bool _declareTypeName = false;
     bool _declareValue = false;
     bool _callingFunction = false;
+    bool _attribValue = false;
 
     public override ProgramData VisitBase_structure([NotNull] CustomLanguageParser.Base_structureContext context) //Done
     {
@@ -58,6 +59,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         _programData.FunctionList.Add(new ProgramData.Function());
         _currentScope.Add(_programData.FunctionList.Last());
         _programData.FunctionList.Last().FunctionType = ProgramData.FuncType.Normal;
+        _programData.FunctionList.Last().IterationType = ProgramData.IterationType.Iterative;
 
         Visit(context.return_type());
 
@@ -72,6 +74,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                     throw new Exception($"At Line {context.Start.Line}: Main already delcared..");
                 else
                     _programData.HasMain = true;
+                _programData.FunctionList.Last().FunctionType = FuncType.Main;
             }
         }
 
@@ -161,6 +164,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | Line: {context.Start.Line}>");
 
             _programData.FunctionList.Last().ControlStructures.Add(new Pair<string, int>("If", context.Start.Line));
+
+            Visit(context.body());
 
         }
         Visit(context.other_statements());
@@ -548,6 +553,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -560,6 +567,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     public override ProgramData VisitVariableAtomExp([NotNull] CustomLanguageParser.VariableAtomExpContext context)
     {
         Visit(context.name());
+
         if(_declareValue)
         {
             _declareValue = false;
@@ -570,7 +578,12 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     public override ProgramData VisitValueAtomEXp([NotNull] CustomLanguageParser.ValueAtomEXpContext context)
     {
         Visit(context.data_value());
-        
+
+        if (_declareValue)
+        {
+            _declareValue = false;
+        }
+
         return _programData;
     }
 
@@ -588,6 +601,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -611,6 +626,9 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if(_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
+
                 _variables.Last().Value = context.GetText();
             }
 
@@ -646,7 +664,6 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 Visit(context.instruction_list());
             }
 
-
             _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | Line: {context.Start.Line}>");
         }
 
@@ -663,6 +680,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -719,6 +738,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -747,6 +768,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -775,6 +798,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -802,6 +827,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -909,6 +936,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -936,6 +965,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -1041,6 +1072,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -1233,10 +1266,45 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if(!ok)
                 throw new Exception($"At Line {context.Start.Line}: Invalid function name..");
 
+            if(lexem == "main")
+                throw new Exception($"At Line {context.Start.Line}: Cannot call <Main>..");
+
+            if (_currentScope.Count != 0)
+                if(_currentScope.Last().Name == lexem)
+                    _currentScope.Last().IterationType = IterationType.Recursive;
         }
 
-        if (_declareValue)
+        if (_declareValue && !_callingFunction)
         {
+            bool ok = false;
+
+            foreach(var v in _programData.GlobalVariables)
+                if (v.Name == lexem)
+                {
+                    ok = true;
+                    break;
+                }
+
+            if(_currentScope.Count != 0)
+            {
+                for (int i = 0; i < _currentScope.Last().Parameters.Count(); i++)
+                    if (_currentScope.Last().Parameters[i].Name == lexem)
+                    {
+                        ok = true;
+                        break;
+                    }
+                for (int i = 0; i < _currentScope.Last().Variables.Count() - 1; i++)
+                    if (_currentScope.Last().Variables[i].Name == lexem)
+                    {
+                        ok = true;
+                        break;
+                    }
+            }
+
+            if(!ok)
+                throw new Exception($"At Line {context.Start.Line}: Variable not found..");
+
+
             _variables.Last().Value = lexem;
         }
 
