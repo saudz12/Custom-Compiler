@@ -17,6 +17,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
    
     List<ProgramData.Variable> _variables = new List<ProgramData.Variable>();
 
+    Variable? _lastAttrib = null;
+
     bool _inAntet = false;
     bool _inGlobalScope = true;
     bool _declareTypeName = false;
@@ -287,6 +289,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (context.name() == null)
                 throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
+            _attribValue = true;
+
             Visit(context.name());
 
             Visit(context.EQADD());
@@ -297,6 +301,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
             Visit(context.instruction());
+
+            _attribValue = false;
         }
 
         return _programData;
@@ -309,6 +315,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (context.name() == null)
                 throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
+            _attribValue = true;
+
             Visit(context.name());
 
             Visit(context.EQSUB());
@@ -319,6 +327,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
             Visit(context.instruction());
+
+            _attribValue = false;
         }
 
         return _programData;
@@ -331,6 +341,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (context.name() == null)
                 throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
+            _attribValue = true;
+
             Visit(context.name());
 
             Visit(context.EQMUL());
@@ -341,6 +353,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
             Visit(context.instruction());
+
+            _attribValue = false;
         }
 
         return _programData;
@@ -353,6 +367,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (context.name() == null)
                 throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
+            _attribValue = true;
+
             Visit(context.name());
 
             Visit(context.EQDIV());
@@ -363,6 +379,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
             Visit(context.instruction());
+
+            _attribValue = false;
         }
 
         return _programData;
@@ -375,6 +393,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (context.name() == null)
                 throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
+            _attribValue = true;
+
             Visit(context.name());
 
             Visit(context.EQMOD());
@@ -385,6 +405,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
             Visit(context.instruction());
+
+            _attribValue = false;
         }
 
         return _programData;
@@ -397,6 +419,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (context.name() == null)
                 throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
 
+            _attribValue = true;
+
             Visit(context.name());
 
             Visit(context.EQUAL());
@@ -407,6 +431,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
                 throw new Exception($"At Line {context.Start.Line}: Missing instruction..");
 
             Visit(context.instruction());
+
+            _attribValue = false;
         }
 
         return _programData;
@@ -1199,28 +1225,46 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     public override ProgramData VisitData_value([NotNull] CustomLanguageParser.Data_valueContext context)
     {
         string token = "";
-
+        
         if (context.INTEGER_VALUE() != null)
         {
-            if(_declareValue && _variables.Last().VariableType == ProgramData.ReturnType.String)
-                throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+            if (_declareValue && _variables.Last().VariableType == ProgramData.ReturnType.String)
+                throw new Exception($"At Line {context.Start.Line}: Value {context.GetText()} not matching {_variables.Last().VariableType.ToString()} type..");
+            else if (_attribValue)
+            {
+                if (_lastAttrib.VariableType == ProgramData.ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+            }
 
             token = "INT";
         }
-        else if (_declareValue && context.FLOAT_VALUE() != null)
+        else if (context.FLOAT_VALUE() != null)
         {
-            if (_variables.Last().VariableType == ProgramData.ReturnType.String)
-                throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+            if (_declareValue && _variables.Last().VariableType == ProgramData.ReturnType.String)
+                throw new Exception($"At Line {context.Start.Line}: Value {context.GetText()} not matching {_variables.Last().VariableType.ToString()} type..");
+            else if (_attribValue)
+            {
+                if (_lastAttrib.VariableType == ProgramData.ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+            }
 
             token = "FLOAT";
         }
-        else if (_declareValue && context.STRING_VALUE() != null)
+        else if (context.STRING_VALUE() != null)
         {
-            if (_variables.Last().VariableType != ProgramData.ReturnType.String)
-                throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+            if (_declareValue && _variables.Last().VariableType != ProgramData.ReturnType.String)
+                throw new Exception($"At Line {context.Start.Line}: Value {context.GetText()} not matching {_variables.Last().VariableType.ToString()} type..");
+            else if (_attribValue)
+            {
+                if (_lastAttrib.VariableType != ProgramData.ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Value not matching type..");
+            }
 
             token = "STRING";
         }
+        else
+            throw new Exception($"Invalid data value {context.GetText()} type at line  {context.Start.Line}");
+
         string lexem = context.GetText();
 
         _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
@@ -1250,6 +1294,85 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 
         _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
 
+        if(_attribValue)
+        {
+            if (_inGlobalScope)
+            {
+                bool found = false;
+
+                if (_callingFunction)
+                {
+                    foreach (var func in _programData.FunctionList)
+                    {
+                        if (func.Name == lexem)
+                        {
+                            //_lastAttrib = func;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found)
+                        throw new Exception($"Fucntion {context.NAME().GetText()} not found at {context.Start.Line}");
+
+                }
+                else
+                {
+                    foreach (var global in _programData.GlobalVariables)
+                    {
+                        if (global.Name == lexem)
+                        {
+                            _lastAttrib = global;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(!found)
+                    throw new Exception($"Variable {context.NAME().GetText()} not found at {context.Start.Line}");
+            }
+            else
+            {
+                bool found = false;
+
+                if (_callingFunction)
+                {
+                    foreach (var func in _programData.FunctionList)
+                    {
+                        if (func.Name == lexem)
+                        {
+                            //_lastAttrib = func;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        throw new Exception($"Fucntion {context.NAME().GetText()} not found at {context.Start.Line}");
+                }
+                else
+                {
+                    foreach (var v in _currentScope.Last().Parameters)
+                        if (v.Name == lexem)
+                        {
+                            _lastAttrib = v;
+                            found = true;
+                            break;
+                        }
+                }
+
+                if( !found )
+                    foreach (var v in _currentScope.Last().Variables)
+                        if (v.Name == lexem)
+                        {
+                            _lastAttrib = v;
+                            found = true;
+                            break;
+                        }
+                if (!found)
+                    throw new Exception($"Variable {context.NAME().GetText()} not found at {context.Start.Line}");
+            }
+        }
+
         if (_callingFunction)
         {
             bool ok = false;
@@ -1264,7 +1387,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             }
 
             if(!ok)
-                throw new Exception($"At Line {context.Start.Line}: Invalid function name..");
+                throw new Exception($"At Line {context.Start.Line}: Invalid function name - {context.NAME().GetText()}..");
 
             if(lexem == "main")
                 throw new Exception($"At Line {context.Start.Line}: Cannot call <Main>..");
@@ -1302,7 +1425,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             }
 
             if(!ok)
-                throw new Exception($"At Line {context.Start.Line}: Variable not found..");
+                throw new Exception($"At Line {context.Start.Line}: Variable {context.NAME().GetText()} not found..");
 
 
             _variables.Last().Value = lexem;

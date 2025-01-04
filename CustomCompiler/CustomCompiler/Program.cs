@@ -19,7 +19,7 @@ public class Program
             CustomLanguageLexer ifConditionLexer = new CustomLanguageLexer(inputStream);
             CommonTokenStream commonTokenStream = new CommonTokenStream(ifConditionLexer);
             CustomLanguageParser parser = new CustomLanguageParser(commonTokenStream);
-
+            
 
             CustomLanguageParser.Base_structureContext context = parser.base_structure();
             CustomCompilerVisitor visitor = new CustomCompilerVisitor();

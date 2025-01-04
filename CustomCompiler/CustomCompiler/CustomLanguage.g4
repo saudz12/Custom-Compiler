@@ -29,7 +29,10 @@ else_statement: ELSE body;
 loop:
 	(
 		(
-			FOR_LOOP OPENPTHS var_decl? SEMICOLON instruction? SEMICOLON instruction? CLOSEPTHS
+			FOR_LOOP OPENPTHS (attribution | var_decl?) SEMICOLON instruction? SEMICOLON (
+				instruction?
+				| attribution
+			) CLOSEPTHS
 		)
 		| (WHILE_LOOP OPENPTHS instruction CLOSEPTHS)
 	) body;
@@ -125,12 +128,6 @@ ELSE: 'else';
 INCREMENT: '++';
 DECREMENT: '--';
 
-MUL: '*';
-DIV: '/';
-ADD: '+';
-SUB: '-';
-MOD: '%';
-
 SMALLER_EQ: '<=';
 GREATER_EQ: '>=';
 SAME: '==';
@@ -148,6 +145,12 @@ EQMUL: '*=';
 EQDIV: '/=';
 EQMOD: '%=';
 EQUAL: '=';
+
+MUL: '*';
+DIV: '/';
+ADD: '+';
+SUB: '-';
+MOD: '%';
 
 NAME: [a-zA-Z][a-zA-Z0-9]*;
 

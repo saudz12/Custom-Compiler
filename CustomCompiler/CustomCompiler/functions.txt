@@ -15,7 +15,7 @@ Variables:
 --> <type>(Int) <name>(a) <value>()
 --> <type>(Int) <name>(b) <value>()
 Control Structures: 
-(If, 10)
+(If, 12)
 
 <return>(Int) <name>(main) : <type>(Main) <iteration>(Iterative))
 Parameters: 
@@ -30,9 +30,9 @@ Variables:
 --> <type>(Int) <name>(temp) <value>(myFirstVariable+5)
 --> <type>(Float) <name>(myFloat) <value>(divideIntegers(myThirdVariable,myFirstVariable))
 Control Structures: 
-(for, 25)
-(If, 34)
-(Else, 39)
-(while, 45)
-(while, 46)
+(for, 27)
+(If, 36)
+(Else, 41)
+(while, 47)
+(while, 48)
 
