@@ -98,11 +98,29 @@ public interface ICustomLanguageVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitElse_statement([NotNull] CustomLanguageParser.Else_statementContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="CustomLanguageParser.loop"/>.
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.for_loop"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitLoop([NotNull] CustomLanguageParser.LoopContext context);
+	Result VisitFor_loop([NotNull] CustomLanguageParser.For_loopContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.for_param"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFor_param([NotNull] CustomLanguageParser.For_paramContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.for_step"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFor_step([NotNull] CustomLanguageParser.For_stepContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="CustomLanguageParser.while_loop"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitWhile_loop([NotNull] CustomLanguageParser.While_loopContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="CustomLanguageParser.code_line"/>.
 	/// </summary>

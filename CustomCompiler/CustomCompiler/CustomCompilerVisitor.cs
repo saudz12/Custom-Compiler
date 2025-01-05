@@ -234,28 +234,90 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         return _programData;
     }
 
-    public override ProgramData VisitLoop([NotNull] CustomLanguageParser.LoopContext context)
+    public override ProgramData VisitFor_loop([NotNull] CustomLanguageParser.For_loopContext context)
     {
-        string token = "";
-        string lexem = "";
+        if(context.FOR_LOOP() != null)
+            _programData.WriteLexic($"<TOKEN: FOR | LEXEM: for | Line: {context.Start.Line}>");
 
-        if (context.FOR_LOOP() != null)
-        {
-            token = "FOR_LOOP";
-            lexem = "for";
-        }
-        else if (context.WHILE_LOOP() != null)
-        {
-            token = "WHILE";
-            lexem = "while";
-        }
+        if(context.OPENPTHS() != null)
+            _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: ( | Line: {context.Start.Line}>");
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing Open Pharanthesis..");
 
-        _programData.WriteLexic($"<TOKEN: {token} | LEXEM: {lexem} | Line: {context.Start.Line}>");
+        if(context.for_param() != null)
+            Visit(context.for_param());
 
-        _programData.FunctionList.Last().ControlStructures.Add(new Pair<string, int>(lexem, context.Start.Line));
+        if(context.SEMICOLON(0) != null)
+            _programData.WriteLexic($"<TOKEN: SEMICOLON | LEXEM: ; | Line: {context.Start.Line}>");
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing semicolon after first statement..");
 
+        if(context.instruction() != null)
+            Visit(context.instruction());
+
+        if (context.SEMICOLON(1) != null)
+            _programData.WriteLexic($"<TOKEN: SEMICOLON | LEXEM: ; | Line: {context.Start.Line}>");
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing semicolon after second statement..");
+
+        if(context.for_step() != null)
+            Visit(context.for_step());
+
+        if (context.CLOSEPTHS() != null)
+            _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | Line: {context.Start.Line}>");
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing Open Pharanthesis..");
+
+        if (context.body() != null)
+            Visit(context.body());
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing body..");
+
+        _currentScope.Last().ControlStructures.Add(new Pair<string, int>("for", context.Start.Line));
+        return _programData;
+    }
+
+    public override ProgramData VisitWhile_loop([NotNull] CustomLanguageParser.While_loopContext context)
+    {
+        if (context.WHILE_LOOP() != null)
+            _programData.WriteLexic($"<TOKEN: WHILE | LEXEM: while | Line: {context.Start.Line}>");
+
+        if (context.OPENPTHS() != null)
+            _programData.WriteLexic($"<TOKEN: OPENPTHS | LEXEM: ( | Line: {context.Start.Line}>");
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing Open Pharanthesis..");
+
+        if (context.instruction() != null)
+            Visit(context.instruction());
+        else
+             throw new Exception($"At Line {context.Start.Line}: Missing condition..");
+
+        if (context.CLOSEPTHS() != null)
+            _programData.WriteLexic($"<TOKEN: CLOSEPTHS | LEXEM: ) | Line: {context.Start.Line}>");
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing Open Pharanthesis..");
+
+        if (context.body() != null)
+            Visit(context.body());
+        else
+            throw new Exception($"At Line {context.Start.Line}: Missing body..");
+
+        _currentScope.Last().ControlStructures.Add(new Pair<string, int>("while", context.Start.Line));
+
+        return _programData;
+    }
+
+    public override ProgramData VisitFor_param([NotNull] CustomLanguageParser.For_paramContext context)
+    {
         VisitChildren(context);
-        
+
+        return _programData;
+    }
+
+    public override ProgramData VisitFor_step([NotNull] CustomLanguageParser.For_stepContext context)
+    {
+        VisitChildren(context);
+
         return _programData;
     }
 
@@ -287,7 +349,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
         if (context.EQADD() != null)
         {
             if (context.name() == null)
-                throw new Exception($"At Line {context.Start.Line}: Missing vareiable..");
+                throw new Exception($"At Line {context.Start.Line}: Missing variable..");
 
             _attribValue = true;
 
@@ -447,8 +509,6 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
 
         if (context.init_param() != null)
             VisitChildren(context);
-        else if (context.other_param() != null)
-            throw new Exception($"At Line {context.Start.Line}: Missing parameter..");
 
         _declareTypeName = false;
         _inAntet = false;

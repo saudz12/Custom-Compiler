@@ -11,7 +11,12 @@ global_var: var_decl SEMICOLON;
 func_decl: return_type NAME OPENPTHS param_decl CLOSEPTHS body;
 
 body:
-	openedblock (loop | if_statement | code_line)* closedblock;
+	openedblock (
+		for_loop
+		| while_loop
+		| if_statement
+		| code_line
+	)* closedblock;
 
 openedblock: OPENEDBLOCK;
 
@@ -26,16 +31,12 @@ else_if_statement: ELSE_IF OPENPTHS instruction CLOSEPTHS body;
 
 else_statement: ELSE body;
 
-loop:
-	(
-		(
-			FOR_LOOP OPENPTHS (attribution | var_decl?) SEMICOLON instruction? SEMICOLON (
-				instruction?
-				| attribution
-			) CLOSEPTHS
-		)
-		| (WHILE_LOOP OPENPTHS instruction CLOSEPTHS)
-	) body;
+for_loop:
+	FOR_LOOP OPENPTHS for_param? SEMICOLON instruction? SEMICOLON for_step? CLOSEPTHS body;
+for_param: (attribution | var_decl);
+for_step: (instruction | attribution);
+
+while_loop: WHILE_LOOP OPENPTHS instruction CLOSEPTHS body;
 
 code_line:
 	(attribution | instruction | return | var_decl) SEMICOLON;
