@@ -1,4 +1,4 @@
-<return>(Int) <name>(addIntegers) : <type>(Normal) <iteration>(Iterative))
+<return>(Int) <name>(addIntegers) : <type>(Normal) <iteration>(Recursive))
 Parameters: 
 --> <type>(Int) <name>(first) <value>()
 --> <type>(Float) <name>(fourth) <value>()

@@ -22,9 +22,12 @@
 <TOKEN: INT | LEXEM: 3 | Line: 5>
 <TOKEN: SEMICOLON | LEXEM: ; | Line: 5>
 <TOKEN: RETURN | LEXEM: return | Line: 6>
+<TOKEN: NAME | LEXEM: addIntegers | Line: 6>
+<TOKEN: OPENPTHS | LEXEM: ( | Line: 6>
 <TOKEN: NAME | LEXEM: first | Line: 6>
 <TOKEN: ADD | LEXEM: + | Line: 6>
 <TOKEN: NAME | LEXEM: second | Line: 6>
+<TOKEN: CLOSEPTHS | LEXEM: ) | Line: 6>
 <TOKEN: SEMICOLON | LEXEM: ; | Line: 6>
 <TOKEN: CLOSEDBLOCK | LEXEM: } | LINE: 7>
 <TOKEN: FLOAT_TYPE | LEXEM: float | Line: 9>
@@ -66,7 +69,7 @@
 <TOKEN: COMMA | LEXEM: , | Line: 19>
 <TOKEN: NAME | LEXEM: secondGlobal | Line: 19>
 <TOKEN: EQUAL | LEXEM: = | Line: 19>
-<TOKEN: FLOAT | LEXEM: -123.12 | Line: 19>
+<TOKEN: INT | LEXEM: 123 | Line: 19>
 <TOKEN: SEMICOLON | LEXEM: ; | LINE: 19>
 <TOKEN: INT_TYPE | LEXEM: int | Line: 21>
 <TOKEN: NAME | LEXEM: main | LINE: 21>

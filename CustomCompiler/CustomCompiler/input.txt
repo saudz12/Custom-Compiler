@@ -3,7 +3,7 @@
     int a, b;
     a = 123;
     b = 3;
-    return     first + second;
+    return     addIntegers(first + second);
 }
 
 float divideIntegers(int first, int third)
@@ -16,7 +16,7 @@ float divideIntegers(int first, int third)
     return first / second;/*iasnfkajsfnjasf
 aSDKjn*/}
 
-double globalVariable = -15.67, secondGlobal = -123.12; //Using global variables is bad practice
+double globalVariable = -15.67, secondGlobal = 123; //Using global variables is bad practice
 
 int main(int x, int y)
 {

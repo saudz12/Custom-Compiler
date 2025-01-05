@@ -334,7 +334,7 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
     {
         VisitChildren(context);
 
-        if (context.SEMICOLON == null)
+        if (context.SEMICOLON() == null)
         {
             throw new Exception($"At Line {context.Start.Line}: Missing semicolon..");
         }
@@ -1080,6 +1080,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
@@ -1107,6 +1109,8 @@ public class CustomCompilerVisitor : CustomLanguageBaseVisitor<ProgramData>
             if (_declareValue)
             {
                 _declareValue = false;
+                if (_variables.Last().VariableType == ReturnType.String)
+                    throw new Exception($"At Line {context.Start.Line}: Ivalid variable type attribution..");
                 _variables.Last().Value = context.GetText();
             }
 
